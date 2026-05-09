@@ -42,7 +42,10 @@ export async function getDishes(params?: {
   offset?: number;
 }): Promise<ApiDishList> {
   const qs = new URLSearchParams({ select: "*" });
-  if (params?.q) qs.set("item", `ilike.*${params.q}*`);
+  if (params?.q) {
+    const q = params.q;
+    qs.set("or", `(item.ilike.*${q}*,place_name.ilike.*${q}*,tags.ilike.*${q}*,description.ilike.*${q}*)`);
+  }
   if (params?.tags) qs.set("tags", `eq.${params.tags}`);
   if (params?.place_id != null) qs.set("place_id", `eq.${params.place_id}`);
   qs.set("order", "item_rating.desc.nullslast,item.asc");
@@ -67,7 +70,10 @@ export async function getPlaces(params?: {
   offset?: number;
 }): Promise<ApiPlaceList> {
   const qs = new URLSearchParams({ select: "*" });
-  if (params?.q) qs.set("place_name", `ilike.*${params.q}*`);
+  if (params?.q) {
+    const q = params.q;
+    qs.set("or", `(place_name.ilike.*${q}*,location.ilike.*${q}*,tags.ilike.*${q}*,area_tags.ilike.*${q}*)`);
+  }
   if (params?.type) qs.set("type", `eq.${params.type}`);
   qs.set("order", "place_name.asc");
   qs.set("limit", String(params?.limit ?? 100));

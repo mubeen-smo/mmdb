@@ -2,13 +2,17 @@ import Link from "next/link";
 import { NavSearch } from "./NavSearch";
 import { NavLinks } from "./NavLinks";
 import { ThemeToggle } from "./ThemeToggle";
+import { MobileNav } from "./MobileNav";
+import { MobileSearch } from "./MobileSearch";
 
 export function Navbar() {
   return (
-    <header className="bg-surface/80 backdrop-blur-md sticky top-0 z-50 w-full border-b border-outline-variant/30 transition-colors duration-300">
-      <nav className="flex items-center justify-between px-margin-mobile md:px-margin-desktop py-4 w-full max-w-container-max mx-auto gap-4">
+    <header className="bg-surface/80 backdrop-blur-md sticky top-0 z-40 w-full border-b border-outline-variant/30 transition-colors duration-300">
+      <nav className="flex items-center justify-between px-margin-mobile md:px-margin-desktop py-4 w-full max-w-container-max mx-auto gap-3">
 
-        <div className="flex items-center gap-stack-md shrink-0">
+        {/* Left: hamburger (mobile) + logo + links (desktop) */}
+        <div className="flex items-center gap-3 shrink-0">
+          <MobileNav />
           <Link
             href="/"
             className="font-display text-xl font-extrabold text-primary tracking-tighter leading-none transition-opacity duration-200 hover:opacity-80"
@@ -18,11 +22,14 @@ export function Navbar() {
           <NavLinks />
         </div>
 
-        <div className="flex-1 max-w-xs sm:max-w-sm md:max-w-md">
+        {/* Center: search pill — desktop only */}
+        <div className="hidden md:block flex-1 max-w-xs sm:max-w-sm md:max-w-md">
           <NavSearch />
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Right: mobile search + theme toggle + ask */}
+        <div className="flex items-center gap-2 shrink-0">
+          <MobileSearch />
           <ThemeToggle />
           <Link
             href="/ask"

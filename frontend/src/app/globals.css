@@ -260,7 +260,7 @@ body {
 .theme-switch {
   --ts-dur: 0.4s;
   --ts-ease: cubic-bezier(0.65, 0, 0.35, 1);
-  --ts-track-off: rgb(var(--_on-surface));       /* dark in light mode */
+  --ts-track-off: #9e9e9e;                          /* neutral grey in light mode */
   --ts-track-on:  rgb(var(--_surface-container-highest)); /* light in dark mode */
   --ts-icon-bg:   rgb(var(--_surface));           /* thumb bg: light in light mode */
   --ts-icon-bg-on: rgb(var(--_on-surface));       /* thumb bg: dark in dark mode */
