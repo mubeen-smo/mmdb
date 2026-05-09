@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MMDb — Articles (Dark)</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ffb3b1", "primary-container": "#bf052b",
+            "on-primary": "#680012", "on-primary-container": "#ffcdcc",
+            "primary-fixed-dim": "#ffb3b1",
+            "secondary": "#c8c6c5", "secondary-container": "#474746",
+            "on-secondary": "#313030", "on-secondary-container": "#b7b5b4",
+            "tertiary": "#c8c6c6", "tertiary-container": "#5f5f5f",
+            "on-tertiary": "#303030",
+            "surface": "#131313", "surface-bright": "#3a3939",
+            "surface-container-lowest": "#0e0e0e", "surface-container-low": "#1c1b1b",
+            "surface-container": "#201f1f", "surface-container-high": "#2a2a2a",
+            "surface-container-highest": "#353534", "surface-variant": "#353534",
+            "on-surface": "#e5e2e1", "on-surface-variant": "#e5bdbc",
+            "outline": "#ac8887", "outline-variant": "#5c403f",
+            "background": "#131313", "on-background": "#e5e2e1",
+            "inverse-surface": "#e5e2e1", "inverse-on-surface": "#313030",
+          },
+          borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          spacing: {
+            "margin-desktop": "48px", "stack-sm": "12px", "stack-md": "24px",
+            "stack-lg": "48px", "gutter": "24px",
+          },
+          fontFamily: {
+            "display-xl": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"],
+            "headline-md": ["Hanken Grotesk"], "body-lg": ["Hanken Grotesk"],
+            "body-md": ["Hanken Grotesk"], "label-md": ["Hanken Grotesk"],
+          },
+          fontSize: {
+            "headline-xl": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "700" }],
+            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "700" }],
+            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "600" }],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    body { background-color: #0e0e0e; font-family: 'Hanken Grotesk', sans-serif; }
+    .treatise-card:hover .treatise-image { transform: scale(1.05); }
+    .search-focus:focus-within { border-color: #bf052b; box-shadow: 0 0 0 1px #bf052b; }
+  </style>
+</head>
+<body class="text-on-background antialiased overflow-x-hidden">
+
+  <!-- Navigation -->
+  <header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50">
+    <nav class="flex justify-between items-center px-6 py-4 w-full max-w-7xl mx-auto">
+      <div class="flex items-center gap-8">
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary tracking-tighter">MMDb</a>
+        <div class="hidden md:flex items-center gap-6">
+          <a href="places-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-body-md text-body-md">Places</a>
+          <a href="dishes-dark.html" class="text-secondary font-medium hover:text-primary transition-colors font-body-md text-body-md">Dishes</a>
+          <a href="#" class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md">Guides</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="articles-light.html" class="p-2 text-secondary hover:text-primary transition-colors">
+          <span class="material-symbols-outlined">light_mode</span>
+        </a>
+        <div class="p-2 bg-surface-container-high rounded-full hover:opacity-80 transition-opacity cursor-pointer">
+          <span class="material-symbols-outlined text-primary">person</span>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="w-full max-w-7xl mx-auto px-6 py-12">
+
+    <!-- Hero & Search -->
+    <section class="mb-16 text-center max-w-3xl mx-auto">
+      <h1 class="font-headline-xl text-headline-xl mb-4 text-on-surface">The Maven's Treatise</h1>
+      <p class="font-body-lg text-body-lg text-secondary mb-8">Definitive guides to global gastronomy, curated by the world's most discerning palates.</p>
+      <div class="search-focus bg-surface-container-low border border-surface-variant rounded-xl flex items-center px-4 py-3 transition-all">
+        <span class="material-symbols-outlined text-outline mr-3">search</span>
+        <input class="bg-transparent border-none text-on-surface focus:ring-0 w-full font-body-md text-body-md outline-none placeholder:text-outline" placeholder="Search guides, regions, or techniques…" type="text" />
+        <span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">tune</span>
+      </div>
+    </section>
+
+    <!-- Cards grid -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <article class="treatise-card bg-surface-container-low rounded-xl overflow-hidden group border border-surface-variant/30 flex flex-col h-full">
+        <div class="relative h-64 overflow-hidden">
+          <img class="treatise-image w-full h-full object-cover transition-transform duration-700 ease-in-out"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9GX71Ijhaj9JdxBJcLhHy7osZl6ZN6OeenM1MUDUZ7_6M4TtJO3-z8JVbagh3_hEEyZKqOndgkgGXbkB8QJnKGIi9aj-4_N3WU--GKxCCxUufdH9F0v-r9QJkPlQ15eLiJYWrzFsa44uC98zwDXikHtsFUlGr-UsxZMHvnsHCpNy4kfz6hyLphu3u9-YXj-8ekQBkxh6y2bnKyR7qgrfD9-QIwRuY6513pz3ULUur6kgAqwVSugxKtiC-PLXCCT_gDtQT94pXn1Y"
+            alt="Modernist dish — dark, editorial" />
+          <div class="absolute top-4 left-4 bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-md text-label-md uppercase tracking-wider">Mastery</div>
+        </div>
+        <div class="p-8 flex flex-col flex-grow">
+          <div class="flex items-center gap-1 mb-4">
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="ml-2 font-label-md text-label-md text-secondary">5.0 Maven Score</span>
+          </div>
+          <h2 class="font-headline-md text-headline-md mb-3 text-on-surface group-hover:text-primary transition-colors">Modernist Fermentation: The New Frontier</h2>
+          <p class="font-body-md text-body-md text-secondary mb-6 line-clamp-3 italic">"Complexity born from patience. This guide explores the intersection of ancient preservation and contemporary flavour architecture…"</p>
+          <div class="mt-auto flex items-center justify-between border-t border-surface-variant pt-6">
+            <span class="font-label-md text-label-md text-outline">12 min read · Technique</span>
+            <span class="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="treatise-card bg-surface-container-low rounded-xl overflow-hidden group border border-surface-variant/30 flex flex-col h-full">
+        <div class="relative h-64 overflow-hidden">
+          <img class="treatise-image w-full h-full object-cover transition-transform duration-700 ease-in-out"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUKsTVisEHwAgl3jlT4d876mHIYo4M9J-wTKJD90IqeovTfB2FhZ2MNxIrvgNaTv0zlXviHScyrgYEEO6ZiypgWwAtNnNDoTIJLb5nbEef1lxnC7hVMh9T5uJDBI6-pZtywYLczME96IE3KeRWrsjw7-lBym-APQvY7fROY8kcEz5hl9xn8BMQhi4MZFggh1DrF6K9nTChHV6ZJa3V05FAZVot2_54jNxb2t_V4n52R232xTbDCRFydTkqgT-WduP04B91YCqKE44"
+            alt="Sushi chef — dark, precision" />
+          <div class="absolute top-4 left-4 bg-surface-container-highest text-secondary px-3 py-1 rounded-full font-label-md text-label-md uppercase tracking-wider">Heritage</div>
+        </div>
+        <div class="p-8 flex flex-col flex-grow">
+          <div class="flex items-center gap-1 mb-4">
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-secondary text-sm">star</span>
+            <span class="ml-2 font-label-md text-label-md text-secondary">4.8 Maven Score</span>
+          </div>
+          <h2 class="font-headline-md text-headline-md mb-3 text-on-surface group-hover:text-primary transition-colors">The Tokyo Underground: Edomae Secrets</h2>
+          <p class="font-body-md text-body-md text-secondary mb-6 line-clamp-3 italic">"Beyond the neon of Ginza lies a world of purists. We reveal the hidden ateliers where centuries-old traditions are whispered across Hinoki counters…"</p>
+          <div class="mt-auto flex items-center justify-between border-t border-surface-variant pt-6">
+            <span class="font-label-md text-label-md text-outline">18 min read · Regional</span>
+            <span class="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="treatise-card bg-surface-container-low rounded-xl overflow-hidden group border border-surface-variant/30 flex flex-col h-full">
+        <div class="relative h-64 overflow-hidden">
+          <img class="treatise-image w-full h-full object-cover transition-transform duration-700 ease-in-out"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-PxSAQQhnl7AD34VRUQCH7F24eA4CED51tcZHUlgIWRAPlr9BSPjOgIwdRnxq_a8Bk1-frUcbVpZWC_JfafS9Z9mwoq5xKi42DV-Z3jPHO9GmP-1dg4k3OjEcNCrtZbvK8abj1DYjrFQqDZkmbQE4YKijD1ihp2Ipge675_3h4QzS5Ct6azf6o3Kp4zq5NOhk_YJG6ZSPd8vvweJmPKgyIGV-XjWWlSrZs6TDMs8tqCzpJztFXiaWiwoWTbpGXRK5U0Buss25u4E"
+            alt="Charcoal grill — ember glow" />
+          <div class="absolute top-4 left-4 bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-md text-label-md uppercase tracking-wider">Editorial</div>
+        </div>
+        <div class="p-8 flex flex-col flex-grow">
+          <div class="flex items-center gap-1 mb-4">
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="ml-2 font-label-md text-label-md text-secondary">4.9 Maven Score</span>
+          </div>
+          <h2 class="font-headline-md text-headline-md mb-3 text-on-surface group-hover:text-primary transition-colors">The Charcoal Manifesto: Fire Mastery</h2>
+          <p class="font-body-md text-body-md text-secondary mb-6 line-clamp-3 italic">"Taming the elemental. A deep dive into the specific thermal properties of Binchotan and the art of the perfect Maillard reaction…"</p>
+          <div class="mt-auto flex items-center justify-between border-t border-surface-variant pt-6">
+            <span class="font-label-md text-label-md text-outline">15 min read · Theory</span>
+            <span class="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="treatise-card bg-surface-container-low rounded-xl overflow-hidden group border border-surface-variant/30 flex flex-col h-full">
+        <div class="relative h-64 overflow-hidden">
+          <img class="treatise-image w-full h-full object-cover transition-transform duration-700 ease-in-out"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzkDW2kqr_jj9hPl-QD4K-vJFD9_cUSO6HGRzXPogxBLZ0u1vzsIF9aqH7dIcDNwgIx17Ki_bwXxyb7t22-c_1X7ts2h6YzVCobdB4i2X9mJsqs8ZhRw5sOgQdzv6714vi2u585e_NbxI5p5d254MxYiQgiAH9P2nIpGBhX2GYgIGHVZJ_q35qomeKka--px2uJIzfb3M5c8_gQ5C3HXY31eSxb_xBX_F2x1xnfRW1Kl3-NNOKeMgOp4eVFbN0gN5ROFf-djjpC2M"
+            alt="Dark Negroni cocktail" />
+          <div class="absolute top-4 left-4 bg-surface-container-highest text-secondary px-3 py-1 rounded-full font-label-md text-label-md uppercase tracking-wider">Libations</div>
+        </div>
+        <div class="p-8 flex flex-col flex-grow">
+          <div class="flex items-center gap-1 mb-4">
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-secondary text-sm">star</span>
+            <span class="ml-2 font-label-md text-label-md text-secondary">4.7 Maven Score</span>
+          </div>
+          <h2 class="font-headline-md text-headline-md mb-3 text-on-surface group-hover:text-primary transition-colors">The Alchemy of the Bitter: Aperitivo Culture</h2>
+          <p class="font-body-md text-body-md text-secondary mb-6 line-clamp-3 italic">"A journey through the botanical landscapes of Italy. Understanding the delicate balance of wormwood, gentian, and citrus zest…"</p>
+          <div class="mt-auto flex items-center justify-between border-t border-surface-variant pt-6">
+            <span class="font-label-md text-label-md text-outline">10 min read · Spirits</span>
+            <span class="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="treatise-card bg-surface-container-low rounded-xl overflow-hidden group border border-surface-variant/30 flex flex-col h-full">
+        <div class="relative h-64 overflow-hidden">
+          <img class="treatise-image w-full h-full object-cover transition-transform duration-700 ease-in-out"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGYu7ETAGF5rLm7jcSSknBilpaUXlpU7oDu_FnWEtiUEFRDugXv1XOn1DDhB9-383JWdfgfwFiGZ30LV2-PU2SXkrKzxHm0avzJPL2GbjKTyzXivggsPZB2FUg3diGoFsS8G4eWqLty7p_O0Yr53GG0l4s4_pe4TnNW66IQ3hQhjSrsIKK1s137U6RCDOy4GJLWAScQq5xM-G28H_kZ5edC3eFbVv3e-fMiqpbxdI7xG1xV7TPdOcFxiE0kbMNfkr25D7odGM_-Q8"
+            alt="Damascus knives on dark slate" />
+          <div class="absolute top-4 left-4 bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-md text-label-md uppercase tracking-wider">Curation</div>
+        </div>
+        <div class="p-8 flex flex-col flex-grow">
+          <div class="flex items-center gap-1 mb-4">
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="ml-2 font-label-md text-label-md text-secondary">5.0 Maven Score</span>
+          </div>
+          <h2 class="font-headline-md text-headline-md mb-3 text-on-surface group-hover:text-primary transition-colors">The Professional Atelier: Essential Gear</h2>
+          <p class="font-body-md text-body-md text-secondary mb-6 line-clamp-3 italic">"We audition the tools that define the modern kitchen. From bespoke Japanese steel to the precise thermal control of induction technology…"</p>
+          <div class="mt-auto flex items-center justify-between border-t border-surface-variant pt-6">
+            <span class="font-label-md text-label-md text-outline">22 min read · Equipment</span>
+            <span class="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="treatise-card bg-surface-container-low rounded-xl overflow-hidden group border border-surface-variant/30 flex flex-col h-full">
+        <div class="relative h-64 overflow-hidden">
+          <img class="treatise-image w-full h-full object-cover transition-transform duration-700 ease-in-out"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgvm6_7YOa5e8Da_qHxErMIpcsQy8wLPcPkK7oN6Im1No5TCySxeJ6rkZDrSTDR8Go-mh3iq2XNI0CBAyCOL6AsbpqF1HVLDyDhDXzHSDkly7Tuzs68yq0t_B-xmcgNvUYvOcaF0AeAZJDcDTEQSh_QAnK7P82tkYLYN4hpZTv-u4Zuao7E97WJBSo-rhTQiby7n17M5spQ2GUmPWCddpSafIEu90jYvEJiPaZXnH0NJBCtZcN8jlluXyhQ0Ly8QQU0eZf3qnGhws"
+            alt="Mirror-glazed pastry on black pedestal" />
+          <div class="absolute top-4 left-4 bg-surface-container-highest text-secondary px-3 py-1 rounded-full font-label-md text-label-md uppercase tracking-wider">Precision</div>
+        </div>
+        <div class="p-8 flex flex-col flex-grow">
+          <div class="flex items-center gap-1 mb-4">
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+            <span class="material-symbols-outlined text-secondary text-sm">star</span>
+            <span class="ml-2 font-label-md text-label-md text-secondary">4.6 Maven Score</span>
+          </div>
+          <h2 class="font-headline-md text-headline-md mb-3 text-on-surface group-hover:text-primary transition-colors">The Architecture of Pâtisserie</h2>
+          <p class="font-body-md text-body-md text-secondary mb-6 line-clamp-3 italic">"Form following function in the world of sweets. We analyse the structural integrity and flavour profiles of contemporary Parisian icons…"</p>
+          <div class="mt-auto flex items-center justify-between border-t border-surface-variant pt-6">
+            <span class="font-label-md text-label-md text-outline">14 min read · Pastry</span>
+            <span class="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- Newsletter CTA -->
+    <section class="mt-24 mb-12 bg-surface-container border border-surface-variant/30 rounded-2xl p-12 text-center">
+      <h3 class="font-headline-lg text-headline-lg mb-4 text-on-surface">The Weekly Dossier</h3>
+      <p class="font-body-md text-body-md text-secondary mb-8 max-w-xl mx-auto">Join 50,000 culinary professionals who receive our weekly breakdown of industry shifts and exclusive recipe previews.</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+        <input class="bg-surface-container-low border border-surface-variant rounded-lg px-4 py-3 focus:ring-1 focus:ring-primary focus:border-primary outline-none flex-grow font-body-md" placeholder="Email address" type="email" />
+        <button class="bg-primary-container text-on-primary-container px-8 py-3 rounded-lg font-label-md uppercase tracking-widest font-bold hover:opacity-90 transition-opacity">Subscribe</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface-container-low mt-24 border-t border-surface-variant/20">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 px-6 py-16 w-full max-w-7xl mx-auto">
+      <div class="space-y-6">
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary block">MMDb</a>
+        <p class="font-body-md text-body-md text-secondary leading-relaxed italic">© 2024 MMDb. The Maven's Guide to Culinary Excellence.</p>
+      </div>
+      <div class="flex flex-col gap-3">
+        <h4 class="font-label-md text-label-md uppercase text-on-surface tracking-widest mb-2">Philosophy</h4>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">About MMDb</a>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">Editorial Policy</a>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">Newsletter</a>
+      </div>
+      <div class="flex flex-col gap-3">
+        <h4 class="font-label-md text-label-md uppercase text-on-surface tracking-widest mb-2">Connect</h4>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">Contact</a>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">Privacy</a>
+        <div class="flex gap-4 mt-4">
+          <span class="material-symbols-outlined text-outline hover:text-primary cursor-pointer">public</span>
+          <span class="material-symbols-outlined text-outline hover:text-primary cursor-pointer">rss_feed</span>
+          <span class="material-symbols-outlined text-outline hover:text-primary cursor-pointer">mail</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- AI Concierge FAB -->
+  <a href="concierge-dark.html" class="fixed bottom-8 right-8 z-50 flex items-center justify-center bg-primary-container text-on-primary-container rounded-full w-14 h-14 shadow-lg hover:shadow-xl hover:scale-110 transition-transform duration-300 active:scale-90 group">
+    <span class="material-symbols-outlined">auto_awesome</span>
+    <div class="absolute right-16 bg-surface-container-high text-on-surface px-4 py-2 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap border border-surface-variant shadow-xl">
+      <p class="font-label-md font-bold">Ask Maven AI</p>
+      <p class="text-xs text-secondary">Recommendations</p>
+    </div>
+  </a>
+
+</body>
+</html>

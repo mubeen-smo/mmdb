@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MMDb — Places (Light)</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#93001e", "primary-container": "#bf052b",
+            "on-primary": "#ffffff", "on-primary-container": "#ffcdcc",
+            "primary-fixed": "#ffdad8",
+            "secondary": "#5f5e5e", "secondary-container": "#e2dfde",
+            "on-secondary": "#ffffff", "on-secondary-container": "#636262",
+            "tertiary": "#464746", "tertiary-fixed": "#e3e2e0",
+            "on-tertiary": "#ffffff",
+            "surface": "#fbf9f8", "surface-bright": "#fbf9f8",
+            "surface-container-lowest": "#ffffff", "surface-container-low": "#f5f3f3",
+            "surface-container": "#efeded", "surface-container-high": "#e9e8e7",
+            "surface-container-highest": "#e4e2e2", "surface-variant": "#e4e2e2",
+            "on-surface": "#1b1c1c", "on-surface-variant": "#5c403f",
+            "outline": "#906f6e", "outline-variant": "#e5bdbc",
+            "background": "#fbf9f8", "on-background": "#1b1c1c",
+          },
+          borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          spacing: {
+            "margin-desktop": "48px", "stack-sm": "12px", "stack-md": "24px",
+            "stack-lg": "48px", "gutter": "24px", "container-max": "1280px",
+          },
+          fontFamily: {
+            "display-xl": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"],
+            "headline-md": ["Hanken Grotesk"], "body-lg": ["Inter"],
+            "body-md": ["Inter"], "label-sm": ["Inter"],
+          },
+          fontSize: {
+            "display-xl": ["60px", { lineHeight: "72px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "headline-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.01em", fontWeight: "700" }],
+            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased selection:bg-primary-fixed selection:text-on-surface">
+
+  <!-- Navigation -->
+  <header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50 w-full border-b border-surface-variant">
+    <nav class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-container-max mx-auto h-16">
+      <div class="flex items-center gap-8">
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary tracking-tighter">MMDb</a>
+        <div class="hidden md:flex gap-6 items-center">
+          <a href="#" class="text-primary font-bold border-b-2 border-primary pb-1 font-label-sm text-label-sm">Places</a>
+          <a href="dishes-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-label-sm text-label-sm">Dishes</a>
+          <a href="guides-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-label-sm text-label-sm">Guides</a>
+        </div>
+      </div>
+      <button class="p-2 hover:bg-surface-container-low rounded-full transition-colors">
+        <span class="material-symbols-outlined text-secondary">dark_mode</span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="max-w-container-max mx-auto px-margin-desktop pb-stack-lg">
+
+    <!-- Hero -->
+    <section class="pt-stack-lg pb-stack-md">
+      <div class="max-w-3xl">
+        <h1 class="font-display-xl text-display-xl text-on-background mb-4">The Maven's Places</h1>
+        <p class="font-body-lg text-body-lg text-secondary max-w-2xl leading-relaxed">Our editors traverse the globe to identify dining establishments that transcend mere sustenance. Each entry represents an apex of technique, hospitality, and atmosphere.</p>
+      </div>
+    </section>
+
+    <!-- Search -->
+    <section class="mb-stack-lg">
+      <div class="relative max-w-xl">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary text-[24px]">search</span>
+        <input class="bg-surface-container-low border-2 border-surface-variant rounded-xl pl-12 pr-4 py-4 text-body-md w-full focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Search the directory of culinary excellence…" type="text" />
+      </div>
+    </section>
+
+    <!-- Restaurant list -->
+    <section class="flex flex-col gap-6">
+
+      <!-- Le Petit Céleste -->
+      <article class="group bg-surface-container-low rounded-xl overflow-hidden hover:shadow-[0_8px_30px_rgba(147,0,30,0.08)] transition-all duration-300 border border-transparent hover:border-outline-variant flex flex-col md:flex-row h-full md:h-64">
+        <div class="w-full md:w-80 h-48 md:h-full shrink-0 overflow-hidden relative">
+          <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHIdIY1oClMH--j6kZI6pekOgSbT7cud5h9X_8pEwGesYja4xi-P7ivPmOC1NHliseLWlx6Gs6SfTK40Hr7hKZJ-2z_AzcGjosHfnENDA3DMOKl0z-M5h-nuOLvk8iyObSdfGMI5GEeKTHOZkqcyRxL6QydRV4n3ZjLINCrss9TSoC-P76oZSIDc4UQQa1UNO8q0Pju-EqbnHVMvD2JiICn9WJgL9dvJgGY_qNLHIllVr8_vMLwNhufqtX_iIz_9R3UTijt-r7yyQ"
+            alt="Le Petit Céleste interior" />
+        </div>
+        <div class="p-6 flex flex-col flex-grow">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="font-label-sm text-[10px] text-primary uppercase tracking-widest block mb-1">Fine Dining · Contemporary</span>
+              <h2 class="font-headline-md text-headline-md text-on-background">Le Petit Céleste</h2>
+              <p class="font-body-md text-secondary text-sm">Paris, 1er Arrondissement</p>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1 flex items-center gap-1">
+              <span class="font-headline-md text-xl text-primary">9.8</span>
+              <span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1">star</span>
+            </div>
+          </div>
+          <p class="font-body-md text-on-surface-variant my-4 line-clamp-2 md:line-clamp-3">A celestial journey through seasonal French ingredients, where Chef Marcel's precision meets an ethereal dining room of glass and light. The menu changes weekly based on local market availability.</p>
+          <div class="mt-auto flex gap-8">
+            <div class="flex flex-col min-w-[120px]">
+              <span class="font-label-sm text-[10px] text-secondary uppercase mb-1">Ambience</span>
+              <div class="flex items-center gap-2">
+                <div class="h-1.5 bg-tertiary-fixed rounded-full w-24"><div class="h-full bg-primary rounded-full" style="width:94%"></div></div>
+                <span class="font-label-sm text-xs font-bold">9.4</span>
+              </div>
+            </div>
+            <div class="flex flex-col min-w-[120px]">
+              <span class="font-label-sm text-[10px] text-secondary uppercase mb-1">Service</span>
+              <div class="flex items-center gap-2">
+                <div class="h-1.5 bg-tertiary-fixed rounded-full w-24"><div class="h-full bg-primary rounded-full" style="width:98%"></div></div>
+                <span class="font-label-sm text-xs font-bold">9.8</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- L'Obsidienne -->
+      <article class="group bg-surface-container-low rounded-xl overflow-hidden hover:shadow-[0_8px_30px_rgba(147,0,30,0.08)] transition-all duration-300 border border-transparent hover:border-outline-variant flex flex-col md:flex-row h-full md:h-64">
+        <div class="w-full md:w-80 h-48 md:h-full shrink-0 overflow-hidden relative">
+          <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQAeVhyP4JpS3xiaFnecbZBG0DLGA4a_EITroePDI58SHOgpGP6mFIEf_huCCyd1STRVh4usov8pghenx6hzKGOFYJZe0AL99cIpjLac0eJZBtrodGf6shf0vqK5nTC4XKf1XOnA1HhLrDFQ_DT9Npu-9QMcmXmbEBLO2GF_CZasawx8r9TvAlP0YqrA7EUEQ59qiEFS-OMMNZgR0Nm40ii6ysYc1BBsK-nkf7u6PCeHJ7C_5uPMvyl1rTQ1qxTVsd1N_TQxpv_HE"
+            alt="L'Obsidienne — volcanic stone bar" />
+        </div>
+        <div class="p-6 flex flex-col flex-grow">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="font-label-sm text-[10px] text-primary uppercase tracking-widest block mb-1">Avant-Garde · Molecular</span>
+              <h2 class="font-headline-md text-headline-md text-on-background">L'Obsidienne</h2>
+              <p class="font-body-md text-secondary text-sm">Lyon, Presqu'île</p>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1 flex items-center gap-1">
+              <span class="font-headline-md text-xl text-primary">9.5</span>
+              <span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1">star</span>
+            </div>
+          </div>
+          <p class="font-body-md text-on-surface-variant my-4 line-clamp-2 md:line-clamp-3">A dark, immersive experience where texture and temperature are manipulated to challenge the palate in a setting of volcanic stone and sharp architectural lighting.</p>
+          <div class="mt-auto flex gap-8">
+            <div class="flex flex-col min-w-[120px]">
+              <span class="font-label-sm text-[10px] text-secondary uppercase mb-1">Ambience</span>
+              <div class="flex items-center gap-2">
+                <div class="h-1.5 bg-tertiary-fixed rounded-full w-24"><div class="h-full bg-primary rounded-full" style="width:99%"></div></div>
+                <span class="font-label-sm text-xs font-bold">9.9</span>
+              </div>
+            </div>
+            <div class="flex flex-col min-w-[120px]">
+              <span class="font-label-sm text-[10px] text-secondary uppercase mb-1">Service</span>
+              <div class="flex items-center gap-2">
+                <div class="h-1.5 bg-tertiary-fixed rounded-full w-24"><div class="h-full bg-primary rounded-full" style="width:91%"></div></div>
+                <span class="font-label-sm text-xs font-bold">9.1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Sureau -->
+      <article class="group bg-surface-container-low rounded-xl overflow-hidden hover:shadow-[0_8px_30px_rgba(147,0,30,0.08)] transition-all duration-300 border border-transparent hover:border-outline-variant flex flex-col md:flex-row h-full md:h-64">
+        <div class="w-full md:w-80 h-48 md:h-full shrink-0 overflow-hidden relative">
+          <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEQXLLCzGcgIAvGPCq0NcQeMssPVKR3Wj3ZsypJP4rV9PggALgKu7g5jiQQzwykDzDdDf2AbieeDGsv6cNDRp58tIOU-9xp_1VoSJflu0gK54cP1ObLdn_XrH-a3SwIpnYlqjDrFpf_Lf03hWSuju83ry5MQf7_v-r6_gQZ7D7AWYJ1EvfJozk4OkZk2BnXDCAaF_xLByq7gLAVnyrY1cS9KMCzSSrNqtBxTxHEIDxKFxlJRHfvOoxtOAPXXG6fBsDuGEzhMKilbo"
+            alt="Sureau — botanical interior with hanging plants" />
+        </div>
+        <div class="p-6 flex flex-col flex-grow">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="font-label-sm text-[10px] text-primary uppercase tracking-widest block mb-1">Neo-Bistro · Foraged</span>
+              <h2 class="font-headline-md text-headline-md text-on-background">Sureau</h2>
+              <p class="font-body-md text-secondary text-sm">Bordeaux, Chartrons</p>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1 flex items-center gap-1">
+              <span class="font-headline-md text-xl text-primary">9.2</span>
+              <span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1">star</span>
+            </div>
+          </div>
+          <p class="font-body-md text-on-surface-variant my-4 line-clamp-2 md:line-clamp-3">Celebrating the wild flora of the Aquitaine region, Sureau offers a rustic yet refined encounter with the French countryside. A bright, airy space with natural wood tones.</p>
+          <div class="mt-auto flex gap-8">
+            <div class="flex flex-col min-w-[120px]">
+              <span class="font-label-sm text-[10px] text-secondary uppercase mb-1">Ambience</span>
+              <div class="flex items-center gap-2">
+                <div class="h-1.5 bg-tertiary-fixed rounded-full w-24"><div class="h-full bg-primary rounded-full" style="width:88%"></div></div>
+                <span class="font-label-sm text-xs font-bold">8.8</span>
+              </div>
+            </div>
+            <div class="flex flex-col min-w-[120px]">
+              <span class="font-label-sm text-[10px] text-secondary uppercase mb-1">Service</span>
+              <div class="flex items-center gap-2">
+                <div class="h-1.5 bg-tertiary-fixed rounded-full w-24"><div class="h-full bg-primary rounded-full" style="width:95%"></div></div>
+                <span class="font-label-sm text-xs font-bold">9.5</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Pavillon -->
+      <article class="group bg-surface-container-low rounded-xl overflow-hidden hover:shadow-[0_8px_30px_rgba(147,0,30,0.08)] transition-all duration-300 border border-transparent hover:border-outline-variant flex flex-col md:flex-row h-full md:h-64">
+        <div class="w-full md:w-80 h-48 md:h-full shrink-0 overflow-hidden relative">
+          <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQu5EvpBk4Pr6B1JJwWoDPHmYuZ53ftWgVHfP1i-0UL-enQoMZvJ8rI7U6dhNs3AXlJnYS6BE9rIGpABPUzFy8xZ1E7sti5WQdgwAj6JU97-oNBjDckXBAWGWn6BW1pHV68RK8d467NRszzl8mBz4T49JNydxWbthB-h4EhG471R5bjdBlxaLg_cPbHMvC_YmHp35sXO8Xsib6YLpdf0p7ILEzMcTy1r78C_Ik4kYXdTfAMihd7R1RFH9jqJT41Gc5Gr7zqTU-DQc"
+            alt="Pavillon — glass pavilion exterior at night" />
+        </div>
+        <div class="p-6 flex flex-col flex-grow">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="font-label-sm text-[10px] text-primary uppercase tracking-widest block mb-1">Classical · Grand Palais</span>
+              <h2 class="font-headline-md text-headline-md text-on-background">Pavillon</h2>
+              <p class="font-body-md text-secondary text-sm">Paris, 8th Arrondissement</p>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1 flex items-center gap-1">
+              <span class="font-headline-md text-xl text-primary">9.7</span>
+              <span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1">star</span>
+            </div>
+          </div>
+          <p class="font-body-md text-on-surface-variant my-4 line-clamp-2 md:line-clamp-3">The definition of classical grandeur, Pavillon serves legacy recipes with a level of silver service rarely seen in the modern age. Opulent decor meets meticulous hospitality.</p>
+          <div class="mt-auto flex gap-8">
+            <div class="flex flex-col min-w-[120px]">
+              <span class="font-label-sm text-[10px] text-secondary uppercase mb-1">Ambience</span>
+              <div class="flex items-center gap-2">
+                <div class="h-1.5 bg-tertiary-fixed rounded-full w-24"><div class="h-full bg-primary rounded-full" style="width:98%"></div></div>
+                <span class="font-label-sm text-xs font-bold">9.8</span>
+              </div>
+            </div>
+            <div class="flex flex-col min-w-[120px]">
+              <span class="font-label-sm text-[10px] text-secondary uppercase mb-1">Service</span>
+              <div class="flex items-center gap-2">
+                <div class="h-1.5 bg-tertiary-fixed rounded-full w-24"><div class="h-full bg-primary rounded-full" style="width:96%"></div></div>
+                <span class="font-label-sm text-xs font-bold">9.6</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface-container-low mt-stack-lg border-t border-surface-variant">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-stack-lg px-margin-desktop py-stack-lg w-full max-w-container-max mx-auto">
+      <div class="flex flex-col gap-4">
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary">MMDb</a>
+        <p class="font-body-md text-secondary leading-relaxed">© 2024 MMDb. The Maven's Guide to Culinary Excellence.</p>
+      </div>
+      <div class="flex flex-col gap-2">
+        <h4 class="font-label-sm text-on-surface font-semibold uppercase tracking-wider mb-2">The Directory</h4>
+        <a class="text-secondary hover:text-primary transition-colors font-body-md" href="#">About MMDb</a>
+        <a class="text-secondary hover:text-primary transition-colors font-body-md" href="#">Editorial Policy</a>
+        <a class="text-secondary hover:text-primary transition-colors font-body-md" href="#">Newsletter</a>
+      </div>
+      <div class="flex flex-col gap-2">
+        <h4 class="font-label-sm text-on-surface font-semibold uppercase tracking-wider mb-2">Legal</h4>
+        <a class="text-secondary hover:text-primary transition-colors font-body-md" href="#">Privacy</a>
+        <a class="text-secondary hover:text-primary transition-colors font-body-md" href="#">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- AI Concierge FAB -->
+  <a href="concierge-light.html" class="fixed bottom-8 right-8 z-50 flex items-center justify-center bg-primary text-on-primary rounded-full w-14 h-14 shadow-lg hover:shadow-xl hover:scale-110 transition-transform duration-300 group">
+    <span class="material-symbols-outlined">auto_awesome</span>
+    <div class="absolute right-16 bg-primary text-on-primary px-4 py-2 rounded-xl text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Ask Maven AI</div>
+  </a>
+
+</body>
+</html>

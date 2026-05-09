@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MMDb — Dishes (Light)</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#93001e", "primary-container": "#bf052b",
+            "on-primary": "#ffffff", "on-primary-container": "#ffcdcc",
+            "secondary": "#5f5e5e", "secondary-container": "#e2dfde",
+            "on-secondary": "#ffffff", "on-secondary-container": "#636262",
+            "tertiary": "#464746", "tertiary-container": "#5e5f5e",
+            "on-tertiary": "#ffffff",
+            "surface": "#fbf9f8", "surface-bright": "#fbf9f8",
+            "surface-container-lowest": "#ffffff", "surface-container-low": "#f5f3f3",
+            "surface-container": "#efeded", "surface-container-high": "#e9e8e7",
+            "surface-container-highest": "#e4e2e2", "surface-variant": "#e4e2e2",
+            "on-surface": "#1b1c1c", "on-surface-variant": "#5c403f",
+            "outline": "#906f6e", "outline-variant": "#e5bdbc",
+            "background": "#fbf9f8", "on-background": "#1b1c1c",
+          },
+          borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          spacing: {
+            "margin-desktop": "48px", "stack-sm": "12px", "stack-md": "24px",
+            "stack-lg": "48px", "gutter": "24px", "container-max": "1280px",
+          },
+          fontFamily: {
+            "display-xl": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"],
+            "headline-md": ["Hanken Grotesk"], "body-lg": ["Inter"],
+            "body-md": ["Inter"], "label-sm": ["Inter"],
+          },
+          fontSize: {
+            "display-xl": ["60px", { lineHeight: "72px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "headline-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.01em", fontWeight: "700" }],
+            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .dish-card:hover { box-shadow: 0 20px 25px -5px rgba(147,0,30,0.1), 0 8px 10px -6px rgba(147,0,30,0.1); }
+    .score-heading { font-family: 'Hanken Grotesk', sans-serif; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased selection:bg-primary/10">
+
+  <!-- Navigation -->
+  <header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant/30">
+    <nav class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-container-max mx-auto">
+      <div class="flex items-center gap-gutter">
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary tracking-tighter">MMDb</a>
+        <div class="hidden md:flex items-center gap-6">
+          <a href="places-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-body-md text-body-md">Places</a>
+          <a href="#" class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md">Dishes</a>
+          <a href="guides-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-body-md text-body-md">Guides</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="dishes-dark.html" class="p-2 rounded-full hover:bg-surface-container transition-colors">
+          <span class="material-symbols-outlined text-secondary">dark_mode</span>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="max-w-container-max mx-auto px-margin-desktop py-stack-lg">
+
+    <!-- Search & Filters -->
+    <section class="mb-stack-lg space-y-stack-md">
+      <div class="max-w-2xl">
+        <h1 class="font-headline-lg text-headline-lg mb-4">Discover Extraordinary Dishes</h1>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+          <input class="w-full pl-12 pr-4 py-4 bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary transition-all font-body-md text-body-md shadow-sm outline-none" placeholder="Search for a dish, cuisine, or restaurant…" type="text" />
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider mr-2">Filters:</span>
+        <button class="px-4 py-2 rounded-full bg-primary text-on-primary font-label-sm text-label-sm flex items-center gap-2">
+          Cuisine <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+        </button>
+        <button class="px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm flex items-center gap-2 hover:bg-surface-variant transition-colors">
+          Price <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+        </button>
+        <button class="px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm flex items-center gap-2 hover:bg-surface-variant transition-colors">
+          Rating <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+        </button>
+        <button class="px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm flex items-center gap-2 hover:bg-surface-variant transition-colors">
+          Dietary <span class="material-symbols-outlined text-sm">keyboard_arrow_down</span>
+        </button>
+        <div class="h-6 w-px bg-outline-variant mx-2"></div>
+        <button class="text-primary font-label-sm text-label-sm hover:underline">Clear all</button>
+      </div>
+    </section>
+
+    <!-- Dishes grid — info-first, score-dominant layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+      <article class="dish-card group bg-surface-container-lowest rounded-2xl p-8 flex justify-between items-start border border-outline-variant/20 transition-all duration-300 cursor-pointer">
+        <div class="flex flex-col justify-between h-full">
+          <div>
+            <h3 class="score-heading text-[32px] text-on-surface mb-1 group-hover:text-primary transition-colors">Pan-Seared U10 Scallops</h3>
+            <p class="text-secondary font-body-md mb-6 italic">L'Artiste Gourmet</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-[11px] uppercase tracking-wider">French</span>
+            <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-[11px] uppercase tracking-wider">$$$</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 pt-1 shrink-0 ml-6">
+          <span class="score-heading text-[48px] text-primary leading-none">9.8</span>
+          <span class="material-symbols-outlined text-primary self-center" style="font-variation-settings: 'FILL' 1; font-size: 32px">star</span>
+        </div>
+      </article>
+
+      <article class="dish-card group bg-surface-container-lowest rounded-2xl p-8 flex justify-between items-start border border-outline-variant/20 transition-all duration-300 cursor-pointer">
+        <div class="flex flex-col justify-between h-full">
+          <div>
+            <h3 class="score-heading text-[32px] text-on-surface mb-1 group-hover:text-primary transition-colors">Harvest Quinoa Bowl</h3>
+            <p class="text-secondary font-body-md mb-6 italic">Flora &amp; Grain</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-[11px] uppercase tracking-wider">Vegan</span>
+            <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-[11px] uppercase tracking-wider">$$</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 pt-1 shrink-0 ml-6">
+          <span class="score-heading text-[48px] text-primary leading-none">9.4</span>
+          <span class="material-symbols-outlined text-primary self-center" style="font-variation-settings: 'FILL' 1; font-size: 32px">star</span>
+        </div>
+      </article>
+
+      <article class="dish-card group bg-surface-container-lowest rounded-2xl p-8 flex justify-between items-start border border-outline-variant/20 transition-all duration-300 cursor-pointer">
+        <div class="flex flex-col justify-between h-full">
+          <div>
+            <h3 class="score-heading text-[32px] text-on-surface mb-1 group-hover:text-primary transition-colors">Black Truffle Agnolotti</h3>
+            <p class="text-secondary font-body-md mb-6 italic">Siena Pasta Bar</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-[11px] uppercase tracking-wider">Italian</span>
+            <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-[11px] uppercase tracking-wider">$$$$</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 pt-1 shrink-0 ml-6">
+          <span class="score-heading text-[48px] text-primary leading-none">10.0</span>
+          <span class="material-symbols-outlined text-primary self-center" style="font-variation-settings: 'FILL' 1; font-size: 32px">star</span>
+        </div>
+      </article>
+
+      <article class="dish-card group bg-surface-container-lowest rounded-2xl p-8 flex justify-between items-start border border-outline-variant/20 transition-all duration-300 cursor-pointer">
+        <div class="flex flex-col justify-between h-full">
+          <div>
+            <h3 class="score-heading text-[32px] text-on-surface mb-1 group-hover:text-primary transition-colors">Deconstructed Pavlova</h3>
+            <p class="text-secondary font-body-md mb-6 italic">The Sweet Maven</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-[11px] uppercase tracking-wider">Dessert</span>
+            <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-[11px] uppercase tracking-wider">$$$</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 pt-1 shrink-0 ml-6">
+          <span class="score-heading text-[48px] text-primary leading-none">9.6</span>
+          <span class="material-symbols-outlined text-primary self-center" style="font-variation-settings: 'FILL' 1; font-size: 32px">star</span>
+        </div>
+      </article>
+
+      <article class="dish-card group bg-surface-container-lowest rounded-2xl p-8 flex justify-between items-start border border-outline-variant/20 transition-all duration-300 cursor-pointer">
+        <div class="flex flex-col justify-between h-full">
+          <div>
+            <h3 class="score-heading text-[32px] text-on-surface mb-1 group-hover:text-primary transition-colors">A5 Wagyu Strip</h3>
+            <p class="text-secondary font-body-md mb-6 italic">Kobe Prime</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-[11px] uppercase tracking-wider">Japanese</span>
+            <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-[11px] uppercase tracking-wider">$$$$</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 pt-1 shrink-0 ml-6">
+          <span class="score-heading text-[48px] text-primary leading-none">9.9</span>
+          <span class="material-symbols-outlined text-primary self-center" style="font-variation-settings: 'FILL' 1; font-size: 32px">star</span>
+        </div>
+      </article>
+
+      <article class="dish-card group bg-surface-container-lowest rounded-2xl p-8 flex justify-between items-start border border-outline-variant/20 transition-all duration-300 cursor-pointer">
+        <div class="flex flex-col justify-between h-full">
+          <div>
+            <h3 class="score-heading text-[32px] text-on-surface mb-1 group-hover:text-primary transition-colors">Glazed Lobster Tail</h3>
+            <p class="text-secondary font-body-md mb-6 italic">Coastal Muse</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-[11px] uppercase tracking-wider">Seafood</span>
+            <span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full font-label-sm text-[11px] uppercase tracking-wider">$$$</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 pt-1 shrink-0 ml-6">
+          <span class="score-heading text-[48px] text-primary leading-none">9.2</span>
+          <span class="material-symbols-outlined text-primary self-center" style="font-variation-settings: 'FILL' 1; font-size: 32px">star</span>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- Load More -->
+    <div class="mt-stack-lg flex justify-center">
+      <button class="px-12 py-4 bg-primary text-on-primary rounded-full font-label-sm text-label-sm uppercase tracking-widest hover:bg-primary-container transition-all active:scale-95 shadow-md">
+        Load More Discoveries
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface-container-low mt-stack-lg border-t border-outline-variant/20">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-stack-lg px-margin-desktop py-stack-lg w-full max-w-container-max mx-auto">
+      <div>
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary block mb-4">MMDb</a>
+        <p class="font-body-md text-secondary">© 2024 MMDb. The Maven's Guide to Culinary Excellence.</p>
+      </div>
+      <div class="flex flex-col gap-2">
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">About MMDb</a>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">Editorial Policy</a>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">Newsletter</a>
+      </div>
+      <div class="flex flex-col gap-2">
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">Contact</a>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- AI Concierge FAB -->
+  <a href="concierge-light.html" class="fixed bottom-8 right-8 z-50 flex items-center justify-center bg-primary text-on-primary rounded-full w-14 h-14 shadow-lg hover:shadow-xl hover:scale-110 transition-transform duration-300 group active:scale-90">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">auto_awesome</span>
+    <div class="absolute right-16 bg-primary text-on-primary px-4 py-2 rounded-lg text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-md font-label-sm">
+      Ask Maven AI
+    </div>
+  </a>
+
+</body>
+</html>

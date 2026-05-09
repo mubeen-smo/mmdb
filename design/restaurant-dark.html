@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MMDb — Restaurant Detail (Dark)</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ffb3b1", "primary-container": "#bf052b",
+            "on-primary": "#ffffff", "on-primary-container": "#ffcdcc",
+            "primary-fixed-dim": "#ffb3b1",
+            "secondary": "#a19f9e", "secondary-container": "#474746",
+            "on-secondary": "#ffffff", "on-secondary-container": "#e2dfde",
+            "secondary-fixed-dim": "#c8c6c5",
+            "tertiary": "#c7c6c5", "on-tertiary": "#ffffff",
+            "surface": "#0d0d0d", "surface-bright": "#222222",
+            "surface-container-lowest": "#0a0a0a", "surface-container-low": "#1a1a1b",
+            "surface-container": "#222222", "surface-container-high": "#282828",
+            "surface-container-highest": "#333333", "surface-variant": "#353534",
+            "on-surface": "#f2f0f0", "on-surface-variant": "#d1cfce",
+            "outline": "#a08c8b", "outline-variant": "#534343",
+            "background": "#0d0d0d", "on-background": "#f2f0f0",
+            "inverse-surface": "#e4e2e2", "inverse-on-surface": "#1b1c1c",
+          },
+          borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          spacing: {
+            "margin-desktop": "48px", "margin-mobile": "16px",
+            "stack-sm": "12px", "stack-md": "24px", "stack-lg": "48px",
+            "gutter": "24px", "container-max": "1280px",
+          },
+          fontFamily: {
+            "display-xl": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"],
+            "headline-md": ["Hanken Grotesk"], "body-lg": ["Inter"],
+            "body-md": ["Inter"], "label-sm": ["Inter"],
+          },
+          fontSize: {
+            "display-xl": ["60px", { lineHeight: "72px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "headline-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.01em", fontWeight: "700" }],
+            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .maven-border-b { border-bottom: 1px solid #303031; }
+    body { background-color: #0d0d0d; color: #f2f0f0; }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased">
+
+  <!-- Navigation -->
+  <header class="bg-black/80 backdrop-blur-md sticky top-0 z-50 border-b border-white/5">
+    <nav class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-container-max mx-auto">
+      <div class="flex items-center gap-8">
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary tracking-tighter">MMDb</a>
+        <div class="hidden md:flex gap-6 items-center">
+          <a href="places-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-body-md text-body-md">Places</a>
+          <a href="dishes-dark.html" class="text-secondary font-medium hover:text-primary transition-colors font-body-md text-body-md">Dishes</a>
+          <a href="guides-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-body-md text-body-md">Guides</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-6">
+        <div class="relative hidden sm:block">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-lg">search</span>
+          <input class="pl-10 pr-4 py-2 rounded-full border-none bg-white/10 focus:ring-1 focus:ring-primary w-64 text-sm font-body-md text-white outline-none" placeholder="Search culinary havens…" type="text" />
+        </div>
+        <a href="restaurant-light.html" class="text-secondary hover:text-primary transition-colors">
+          <span class="material-symbols-outlined">light_mode</span>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="max-w-container-max mx-auto px-margin-desktop pb-stack-lg">
+
+    <!-- Hero -->
+    <section class="py-stack-lg flex flex-col items-center text-center">
+      <span class="text-primary font-label-sm tracking-widest uppercase mb-2">Editorial Review</span>
+      <h1 class="font-display-xl text-display-xl text-white mb-4">Le Petit Céleste</h1>
+      <a class="flex items-center gap-2 text-primary hover:underline font-label-sm mb-6" href="#">
+        <span class="material-symbols-outlined text-sm">location_on</span>
+        GET DIRECTIONS
+      </a>
+      <div class="relative w-full aspect-[21/9] rounded-xl overflow-hidden mb-stack-md shadow-2xl">
+        <img class="w-full h-full object-cover"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAe0jrZKkYgefhVXsgqtf-ZwKWod6---MI7VMLDnbR546dmCTCQsfMNlyFgyzXEM-IfMp-lNwZgd1bW3Rfwlu02vhEtO47PR0jWot0xfL7vDc1xOioBRKi7hJsxhRnPgPT-8EArYY49qUxGD1RAK08hBUyyNfKNaCGY0ApAjFTrCEJ2oEEVggSOaifM_cGEH4zOFo8OfkNtT0dj4ePhflAZpmZE8SUEzJwv85-nwaRL1jbWA1DMP3MhCW6yiDUoaphmhkj1E5CuoYk"
+          alt="Le Petit Céleste — vaulted ceilings, brass chandeliers, twilight view" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+      </div>
+    </section>
+
+    <!-- Scores -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-gutter mb-stack-lg">
+      <div class="bg-white/5 p-stack-md rounded-xl flex items-center justify-between border-l-4 border-primary shadow-sm">
+        <div>
+          <h3 class="font-headline-md text-headline-md text-white">Ambience</h3>
+          <p class="text-secondary font-body-md">Celestial harmony &amp; architectural grace.</p>
+        </div>
+        <div class="flex items-baseline gap-1">
+          <span class="font-display-xl text-headline-lg text-primary">9.4</span>
+          <span class="text-secondary font-label-sm">/ 10</span>
+        </div>
+      </div>
+      <div class="bg-white/5 p-stack-md rounded-xl flex items-center justify-between border-l-4 border-primary shadow-sm">
+        <div>
+          <h3 class="font-headline-md text-headline-md text-white">Service</h3>
+          <p class="text-secondary font-body-md">Invisible, anticipatory, and flawless.</p>
+        </div>
+        <div class="flex items-baseline gap-1">
+          <span class="font-display-xl text-headline-lg text-primary">9.8</span>
+          <span class="text-secondary font-label-sm">/ 10</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Degustation -->
+    <div class="max-w-[800px] mx-auto">
+      <div class="flex items-center gap-4 mb-stack-md">
+        <div class="h-px flex-1 bg-white/10"></div>
+        <h2 class="font-label-sm text-primary uppercase tracking-[0.2em]">The Degustation Journey</h2>
+        <div class="h-px flex-1 bg-white/10"></div>
+      </div>
+
+      <div class="space-y-stack-lg">
+
+        <article class="group">
+          <div class="flex justify-between items-baseline maven-border-b pb-2 mb-4">
+            <h3 class="font-headline-md text-headline-md text-white group-hover:text-primary transition-colors">01. Atlantic Bluefin Tartare</h3>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+              <span class="font-headline-md text-headline-md text-primary">9.6</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-8">
+            <div>
+              <p class="text-secondary font-body-md mb-6 leading-relaxed">A masterclass in balance, the bluefin is diced to precision and accented with compressed cucumber, kohlrabi juice, and a delicate emulsion of ginger-infused olive oil. The freshness is electric, cutting through the natural fattiness of the fish with surgical grace.</p>
+              <div class="bg-white/5 p-4 rounded-lg">
+                <span class="font-label-sm text-primary uppercase block mb-2">How to Savour</span>
+                <p class="text-secondary font-body-md text-sm italic">"Begin with a small morsel of the fish alone to appreciate the cold-pressed ginger. Then incorporate a single leaf of micro-shiso for a sudden, peppery burst."</p>
+              </div>
+            </div>
+            <div class="rounded-lg overflow-hidden h-40 lg:h-auto shadow-md">
+              <img class="w-full h-full object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAl4o4Eow4Xq_49ywGPmAI6snpuVhavAq_J1ReqzcuTGEfZPFsL5EhpEEAlUUTWSKTeoFYSQfFqgfq8523_XvNV2PUKd1Ceqg6T6rRgBNvXfKdNnMbB6dQX0vbhoT_vC5nWCsKadvHg7T7VymIqeZO5qpzSDATz0aYJ6DcFqH82Y3zdGng47gppr2SWXv-JU8weTNzAybhju8IDcjBeLGlwCUIT49_Kv9u5xEst0mjci6xktt25ZPwdOkHPQqdPOsyCchrrpsKRluY"
+                alt="Atlantic Bluefin Tartare with gold leaf and edible flowers" />
+            </div>
+          </div>
+        </article>
+
+        <article class="group">
+          <div class="flex justify-between items-baseline maven-border-b pb-2 mb-4">
+            <h3 class="font-headline-md text-headline-md text-white group-hover:text-primary transition-colors">02. Truffle Forest Risotto</h3>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star_half</span>
+              <span class="font-headline-md text-headline-md text-primary">9.2</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-8">
+            <div>
+              <p class="text-secondary font-body-md mb-6 leading-relaxed">Acquerello rice, aged for seven years, provides a texture that is simultaneously firm and velvety. Infused with a 24-hour mushroom consommé and topped with generous shavings of Périgord black truffle, it evokes the damp, rich aroma of an autumn woodland.</p>
+              <div class="bg-white/5 p-4 rounded-lg">
+                <span class="font-label-sm text-primary uppercase block mb-2">How to Savour</span>
+                <p class="text-secondary font-body-md text-sm italic">"Stir the truffle shavings into the core for exactly five seconds. The heat activates the aroma. Inhale deeply before the first bite."</p>
+              </div>
+            </div>
+            <div class="rounded-lg overflow-hidden h-40 lg:h-auto shadow-md">
+              <img class="w-full h-full object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxNKy63eRjUYQ5jui_vVLkSC5YCbRm1C7fHg9YxNjM8rTZJkUGMF5JrBLk-8T4zSSnIU8qvyWidWABACkhtSYzWzDJzzWwsTjYgTr_axUtR2UdjQ1L-B1FlBZBmhMSRy9grjh6sFNoAqdZQmsagQDr9uvWUfjZLAjFATwZZf-8-OvbGSiLvh_PhtWwKPqYTXgciTGzrteshblfuOJdz5ZLYCmVN2p4RW0QJ7GX62AKbgQjFWZ3INSyUxyTzZzi5n3UowO-F5TzynI"
+                alt="Truffle Forest Risotto in charcoal bowl" />
+            </div>
+          </div>
+        </article>
+
+        <article class="group">
+          <div class="flex justify-between items-baseline maven-border-b pb-2 mb-4">
+            <h3 class="font-headline-md text-headline-md text-white group-hover:text-primary transition-colors">03. The Ruby Sphere</h3>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+              <span class="font-headline-md text-headline-md text-primary">9.9</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-8">
+            <div>
+              <p class="text-secondary font-body-md mb-6 leading-relaxed">A technical marvel of pastry. A paper-thin sugar shell in the brand's signature crimson hue encapsulates a light white chocolate mousse and a molten raspberry core. It sits atop a bed of cocoa 'soil' that provides a bitter counterpoint to the sweetness.</p>
+              <div class="bg-white/5 p-4 rounded-lg">
+                <span class="font-label-sm text-primary uppercase block mb-2">How to Savour</span>
+                <p class="text-secondary font-body-md text-sm italic">"Use the back of your silver spoon to crack the sphere's apex. Let the raspberry coulis flow into the cocoa soil before scooping all three textures into a single bite."</p>
+              </div>
+            </div>
+            <div class="rounded-lg overflow-hidden h-40 lg:h-auto shadow-md">
+              <img class="w-full h-full object-cover"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuGBOFHAxbz0iAH-zulWdtLSk9qVNbl1-BLef45E3WtQdTJ0Z4fHSsXwFTk-HRzb-5NkZBtvhSVRmbJf_AyepR7Zv7DkeCMDB_ISOtikDvSPl_HhwCR8s35MIg9XjblQdZyMxf6vbAeXx4UpOFKAmaz1lKSRKoASVq10R5Vk3JdKkKozWBdEDAz1EXIZcXh-gkWfZKpFXYhF4dlcCmvDYxx3024rC7otlmG9wkF4m5L6kJN31jbFSQzCMkZCKA9FI2l1KEslqkJtM"
+                alt="The Ruby Sphere — crimson sugar globe on cocoa soil" />
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-black/90 mt-stack-lg border-t border-white/5">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-stack-lg px-margin-desktop py-stack-lg w-full max-w-container-max mx-auto">
+      <div class="flex flex-col gap-4">
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary">MMDb</a>
+        <p class="text-secondary font-body-md max-w-xs">The Maven's Guide to Culinary Excellence. Dedicated to the pursuit of the extraordinary.</p>
+      </div>
+      <div class="flex flex-col gap-4">
+        <h4 class="font-label-sm text-white font-semibold uppercase tracking-wider">Publication</h4>
+        <nav class="flex flex-col gap-2">
+          <a class="text-secondary hover:text-primary transition-colors font-body-md text-body-md hover:underline" href="#">About MMDb</a>
+          <a class="text-secondary hover:text-primary transition-colors font-body-md text-body-md hover:underline" href="#">Editorial Policy</a>
+          <a class="text-secondary hover:text-primary transition-colors font-body-md text-body-md hover:underline" href="#">Newsletter</a>
+        </nav>
+      </div>
+      <div class="flex flex-col gap-4">
+        <h4 class="font-label-sm text-white font-semibold uppercase tracking-wider">Legal</h4>
+        <nav class="flex flex-col gap-2">
+          <a class="text-secondary hover:text-primary transition-colors font-body-md text-body-md hover:underline" href="#">Contact</a>
+          <a class="text-secondary hover:text-primary transition-colors font-body-md text-body-md hover:underline" href="#">Privacy</a>
+        </nav>
+        <p class="text-secondary font-label-sm mt-4">© 2024 MMDb. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- AI Concierge FAB -->
+  <button class="fixed bottom-8 right-8 z-50 bg-primary-container text-white rounded-full w-14 h-14 shadow-lg hover:shadow-xl hover:scale-110 transition-transform duration-300 active:scale-90 flex items-center justify-center group relative">
+    <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1">auto_awesome</span>
+    <div class="absolute right-full mr-4 bg-inverse-surface text-inverse-on-surface px-4 py-2 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap border border-white/10">
+      <p class="font-label-sm font-bold">Ask Maven AI</p>
+      <p class="text-[10px] text-secondary">Menu advice &amp; reservations</p>
+    </div>
+  </button>
+
+</body>
+</html>

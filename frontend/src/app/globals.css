@@ -1,0 +1,450 @@
+@import "tailwindcss";
+
+/* Class-based dark variant — applied when <html class="dark"> */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   Raw RGB triplets — swapped by .dark on <html>
+   Using raw triplets (no rgb() wrapper) so opacity modifiers
+   like bg-surface/80 work correctly via color-mix().
+   ============================================================ */
+
+:root {
+  /* Primary */
+  --_primary:                  147 0 30;
+  --_primary-container:        191 5 43;
+  --_on-primary:               255 255 255;
+  --_on-primary-container:     255 205 204;
+  --_primary-fixed:            255 218 216;
+  --_primary-fixed-dim:        255 179 177;
+
+  /* Secondary */
+  --_secondary:                95 94 94;
+  --_secondary-container:      226 223 222;
+  --_on-secondary:             255 255 255;
+  --_on-secondary-container:   99 98 98;
+  --_secondary-fixed-dim:      200 198 197;
+
+  /* Tertiary */
+  --_tertiary:                 70 71 70;
+  --_tertiary-container:       94 95 94;
+  --_on-tertiary:              255 255 255;
+  --_on-tertiary-container:    218 217 215;
+  --_tertiary-fixed:           227 226 224;
+
+  /* Surface */
+  --_surface:                      251 249 248;
+  --_surface-dim:                  219 218 217;
+  --_surface-bright:               251 249 248;
+  --_surface-container-lowest:     255 255 255;
+  --_surface-container-low:        245 243 243;
+  --_surface-container:            239 237 237;
+  --_surface-container-high:       233 232 231;
+  --_surface-container-highest:    228 226 226;
+  --_surface-variant:              228 226 226;
+  --_on-surface:                   27 28 28;
+  --_on-surface-variant:           92 64 63;
+
+  /* Outline */
+  --_outline:         144 111 110;
+  --_outline-variant: 229 189 188;
+
+  /* Background */
+  --_background:    251 249 248;
+  --_on-background: 27 28 28;
+
+  /* Inverse */
+  --_inverse-surface:    48 48 49;
+  --_inverse-on-surface: 242 240 240;
+  --_inverse-primary:    255 179 177;
+}
+
+.dark {
+  /* Primary — brighter crimson readable on dark bg */
+  --_primary:                  191 5 43;
+  --_primary-container:        191 5 43;
+  --_on-primary:               255 255 255;
+  --_on-primary-container:     255 255 255;
+  --_primary-fixed:            255 218 216;
+  --_primary-fixed-dim:        255 179 177;
+
+  /* Secondary */
+  --_secondary:                163 163 163;
+  --_secondary-container:      71 71 70;
+  --_on-secondary:             19 19 19;
+  --_on-secondary-container:   226 223 222;
+  --_secondary-fixed-dim:      200 198 197;
+
+  /* Tertiary */
+  --_tertiary:                 199 198 197;
+  --_tertiary-container:       70 71 70;
+  --_on-tertiary:              19 19 19;
+  --_on-tertiary-container:    219 217 217;
+  --_tertiary-fixed:           227 226 224;
+
+  /* Surface */
+  --_surface:                      19 19 19;
+  --_surface-dim:                  19 19 19;
+  --_surface-bright:               34 34 34;
+  --_surface-container-lowest:     10 10 10;
+  --_surface-container-low:        28 28 28;
+  --_surface-container:            34 34 34;
+  --_surface-container-high:       40 40 40;
+  --_surface-container-highest:    51 51 51;
+  --_surface-variant:              53 53 52;
+  --_on-surface:                   229 226 225;
+  --_on-surface-variant:           216 194 193;
+
+  /* Outline */
+  --_outline:         160 140 139;
+  --_outline-variant: 83 67 67;
+
+  /* Background */
+  --_background:    19 19 19;
+  --_on-background: 229 226 225;
+
+  /* Inverse */
+  --_inverse-surface:    228 226 226;
+  --_inverse-on-surface: 27 28 28;
+  --_inverse-primary:    147 0 30;
+}
+
+/* ============================================================
+   Design Tokens — reference dynamic CSS vars so every
+   Tailwind utility (bg-surface, text-primary, etc.) switches
+   automatically when .dark is toggled on <html>.
+   ============================================================ */
+
+@theme {
+  --color-primary:                  rgb(var(--_primary));
+  --color-primary-container:        rgb(var(--_primary-container));
+  --color-on-primary:               rgb(var(--_on-primary));
+  --color-on-primary-container:     rgb(var(--_on-primary-container));
+  --color-primary-fixed:            rgb(var(--_primary-fixed));
+  --color-primary-fixed-dim:        rgb(var(--_primary-fixed-dim));
+  --color-on-primary-fixed:         #410008;
+  --color-on-primary-fixed-variant: #92001e;
+
+  --color-secondary:                  rgb(var(--_secondary));
+  --color-secondary-container:        rgb(var(--_secondary-container));
+  --color-on-secondary:               rgb(var(--_on-secondary));
+  --color-on-secondary-container:     rgb(var(--_on-secondary-container));
+  --color-secondary-fixed:            #e5e2e1;
+  --color-secondary-fixed-dim:        rgb(var(--_secondary-fixed-dim));
+  --color-on-secondary-fixed:         #1c1b1b;
+  --color-on-secondary-fixed-variant: #474746;
+
+  --color-tertiary:                   rgb(var(--_tertiary));
+  --color-tertiary-container:         rgb(var(--_tertiary-container));
+  --color-on-tertiary:                rgb(var(--_on-tertiary));
+  --color-on-tertiary-container:      rgb(var(--_on-tertiary-container));
+  --color-tertiary-fixed:             rgb(var(--_tertiary-fixed));
+  --color-tertiary-fixed-dim:         #c7c6c5;
+  --color-on-tertiary-fixed:          #1a1c1b;
+  --color-on-tertiary-fixed-variant:  #464746;
+
+  --color-surface:                    rgb(var(--_surface));
+  --color-surface-dim:                rgb(var(--_surface-dim));
+  --color-surface-bright:             rgb(var(--_surface-bright));
+  --color-surface-container-lowest:   rgb(var(--_surface-container-lowest));
+  --color-surface-container-low:      rgb(var(--_surface-container-low));
+  --color-surface-container:          rgb(var(--_surface-container));
+  --color-surface-container-high:     rgb(var(--_surface-container-high));
+  --color-surface-container-highest:  rgb(var(--_surface-container-highest));
+  --color-surface-variant:            rgb(var(--_surface-variant));
+  --color-on-surface:                 rgb(var(--_on-surface));
+  --color-on-surface-variant:         rgb(var(--_on-surface-variant));
+
+  --color-outline:         rgb(var(--_outline));
+  --color-outline-variant: rgb(var(--_outline-variant));
+
+  --color-background:    rgb(var(--_background));
+  --color-on-background: rgb(var(--_on-background));
+
+  --color-inverse-surface:    rgb(var(--_inverse-surface));
+  --color-inverse-on-surface: rgb(var(--_inverse-on-surface));
+  --color-inverse-primary:    rgb(var(--_inverse-primary));
+
+  --color-error:              #ba1a1a;
+  --color-error-container:    #ffdad6;
+  --color-on-error:           #ffffff;
+  --color-on-error-container: #93000a;
+
+  /* ---- Fonts ---- */
+  --font-sans:    var(--font-inter), 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-hanken-grotesk), 'Hanken Grotesk', ui-sans-serif, sans-serif;
+  --font-body:    var(--font-inter), 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    ui-monospace, 'Cascadia Code', 'Source Code Pro', monospace;
+
+  /* ---- Spacing ---- */
+  --spacing-margin-mobile:  1rem;
+  --spacing-margin-desktop: 3rem;
+  --spacing-stack-sm:       0.75rem;
+  --spacing-stack-md:       1.5rem;
+  --spacing-stack-lg:       3rem;
+  --spacing-gutter:         1.5rem;
+  --spacing-container-max:  80rem;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+
+:root { color-scheme: light; }
+.dark { color-scheme: dark; }
+
+body {
+  background-color: rgb(var(--_background));
+  color: rgb(var(--_on-background));
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   Typography scale
+   ============================================================ */
+
+.type-display-xl {
+  font-family: var(--font-display);
+  font-size: 3.75rem;
+  line-height: 4.5rem;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+.type-headline-lg {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  line-height: 3rem;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+.type-headline-lg-mobile {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 2.5rem;
+  font-weight: 700;
+}
+.type-headline-md {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 600;
+}
+.type-body-lg {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 400;
+}
+.type-body-md {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 400;
+}
+.type-label-sm {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+/* ============================================================
+   Theme switch — sun/moon animated toggle
+   Ported from original CSS, scaled to 18px base for navbar fit,
+   colors wired to MMDb palette CSS vars.
+   ============================================================ */
+
+.theme-switch {
+  --ts-dur: 0.4s;
+  --ts-ease: cubic-bezier(0.65, 0, 0.35, 1);
+  --ts-track-off: rgb(var(--_on-surface));       /* dark in light mode */
+  --ts-track-on:  rgb(var(--_surface-container-highest)); /* light in dark mode */
+  --ts-icon-bg:   rgb(var(--_surface));           /* thumb bg: light in light mode */
+  --ts-icon-bg-on: rgb(var(--_on-surface));       /* thumb bg: dark in dark mode */
+  --ts-ray:       rgb(var(--_on-surface));
+  --ts-ray-on:    rgb(var(--_surface-container-highest));
+  font-size: 18px;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.theme-switch__input,
+.theme-switch__input::before {
+  background-color: var(--ts-track-off);
+}
+.theme-switch__input {
+  border-radius: 0.75em;
+  cursor: pointer;
+  display: block;
+  width: 3em;
+  height: 1.5em;
+  transition: background-color var(--ts-dur) var(--ts-ease);
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.theme-switch__input::before {
+  border-radius: 50%;
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0.125em;
+  left: 0.125em;
+  width: 1.25em;
+  height: 1.25em;
+  transition:
+    background-color var(--ts-dur) var(--ts-ease),
+    transform var(--ts-dur) var(--ts-ease);
+}
+
+.theme-switch__icon,
+.theme-switch__icon-part {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.theme-switch__icon {
+  background-color: var(--ts-icon-bg);
+  border-radius: 50%;
+  overflow: hidden;
+  pointer-events: none;
+  top: 0.125em;
+  left: 0.125em;
+  width: 1.25em;
+  height: 1.25em;
+  transition: transform var(--ts-dur) var(--ts-ease);
+}
+.theme-switch__icon-part {
+  transition:
+    box-shadow var(--ts-dur) var(--ts-ease),
+    transform   var(--ts-dur) var(--ts-ease);
+}
+.theme-switch__icon-part--1,
+.theme-switch__icon-part--2,
+.theme-switch__icon-part--3 {
+  border-radius: 50%;
+}
+.theme-switch__icon-part--1 {
+  background-color: var(--ts-icon-bg);
+  top:  calc(50% - 0.375em);
+  left: calc(50% - 0.375em);
+  width: 0.75em;
+  height: 0.75em;
+}
+.theme-switch__icon-part--2 {
+  background-color: var(--ts-ray);
+  top:  calc(50% - 0.4375em);
+  left: calc(50% - 0.0625em);
+  width: 0.5em;
+  height: 0.5em;
+  transform: translate(-0.1875em, 0.1875em) scale(0.2);
+}
+.theme-switch__icon-part--3 {
+  box-shadow: 0 0 0 0.625em var(--ts-ray) inset;
+  width: 1.25em;
+  height: 1.25em;
+  transform: scale(0.25);
+}
+.theme-switch__icon-part--3 ~ .theme-switch__icon-part {
+  background-color: var(--ts-ray);
+  border-radius: 0.0625em;
+  top:  50%;
+  left: 50%;
+  width: 0.125em;
+  height: 0.1875em;
+  transform-origin: 50% 0;
+}
+.theme-switch__icon-part--4  { transform: translateX(-50%) rotate(0deg)   translateY(0.25em); }
+.theme-switch__icon-part--5  { transform: translateX(-50%) rotate(45deg)  translateY(0.25em); }
+.theme-switch__icon-part--6  { transform: translateX(-50%) rotate(90deg)  translateY(0.25em); }
+.theme-switch__icon-part--7  { transform: translateX(-50%) rotate(135deg) translateY(0.25em); }
+.theme-switch__icon-part--8  { transform: translateX(-50%) rotate(180deg) translateY(0.25em); }
+.theme-switch__icon-part--9  { transform: translateX(-50%) rotate(225deg) translateY(0.25em); }
+.theme-switch__icon-part--10 { transform: translateX(-50%) rotate(270deg) translateY(0.25em); }
+.theme-switch__icon-part--11 { transform: translateX(-50%) rotate(315deg) translateY(0.25em); }
+
+/* Checked (dark mode) state */
+.theme-switch__input:checked {
+  background-color: var(--ts-track-on);
+}
+.theme-switch__input:checked::before,
+.theme-switch__input:checked ~ .theme-switch__icon {
+  transform: translateX(1.5em);
+}
+.theme-switch__input:checked ~ .theme-switch__icon {
+  background-color: var(--ts-icon-bg-on);
+}
+.theme-switch__input:checked ~ .theme-switch__icon .theme-switch__icon-part--1 {
+  background-color: var(--ts-icon-bg-on);
+}
+.theme-switch__input:checked ~ .theme-switch__icon .theme-switch__icon-part--2 {
+  background-color: var(--ts-ray-on);
+  transform: translate(0, 0) scale(1);
+}
+.theme-switch__input:checked ~ .theme-switch__icon .theme-switch__icon-part--3 {
+  box-shadow: 0 0 0 0.25em var(--ts-ray-on) inset;
+  transform: scale(1);
+}
+.theme-switch__input:checked ~ .theme-switch__icon .theme-switch__icon-part--3 ~ .theme-switch__icon-part {
+  background-color: var(--ts-ray-on);
+}
+.theme-switch__input:checked ~ .theme-switch__icon .theme-switch__icon-part--4  { transform: translateX(-50%) rotate(0deg)   translateY(0.625em) scale(0); }
+.theme-switch__input:checked ~ .theme-switch__icon .theme-switch__icon-part--5  { transform: translateX(-50%) rotate(45deg)  translateY(0.625em) scale(0); }
+.theme-switch__input:checked ~ .theme-switch__icon .theme-switch__icon-part--6  { transform: translateX(-50%) rotate(90deg)  translateY(0.625em) scale(0); }
+.theme-switch__input:checked ~ .theme-switch__icon .theme-switch__icon-part--7  { transform: translateX(-50%) rotate(135deg) translateY(0.625em) scale(0); }
+.theme-switch__input:checked ~ .theme-switch__icon .theme-switch__icon-part--8  { transform: translateX(-50%) rotate(180deg) translateY(0.625em) scale(0); }
+.theme-switch__input:checked ~ .theme-switch__icon .theme-switch__icon-part--9  { transform: translateX(-50%) rotate(225deg) translateY(0.625em) scale(0); }
+.theme-switch__input:checked ~ .theme-switch__icon .theme-switch__icon-part--10 { transform: translateX(-50%) rotate(270deg) translateY(0.625em) scale(0); }
+.theme-switch__input:checked ~ .theme-switch__icon .theme-switch__icon-part--11 { transform: translateX(-50%) rotate(315deg) translateY(0.625em) scale(0); }
+
+.theme-switch__sr {
+  overflow: hidden;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+}
+
+/* ============================================================
+   Page transition
+   ============================================================ */
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-enter {
+  animation: page-enter 0.25s ease-out both;
+}
+
+/* Smoother base transitions for interactive elements */
+a, button {
+  transition-property: color, background-color, border-color, opacity, transform, box-shadow;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 768px) {
+  .type-display-xl {
+    font-size: 2rem;
+    line-height: 2.5rem;
+    letter-spacing: -0.01em;
+  }
+  .type-headline-lg {
+    font-size: 2rem;
+    line-height: 2.5rem;
+  }
+}

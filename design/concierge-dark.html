@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MMDb — Ask MMDb (Dark)</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ffb3b1", "primary-container": "#bf052b",
+            "on-primary": "#680012", "on-primary-container": "#ffcdcc",
+            "primary-fixed": "#ffdad8", "primary-fixed-dim": "#ffb3b1",
+            "secondary": "#c8c6c5", "secondary-container": "#474746",
+            "on-secondary": "#313030", "on-secondary-container": "#b7b5b4",
+            "tertiary": "#c8c6c6", "tertiary-container": "#5f5f5f",
+            "on-tertiary": "#303030", "on-tertiary-container": "#dbd9d9",
+            "surface": "#131313", "surface-dim": "#131313", "surface-bright": "#3a3939",
+            "surface-container-lowest": "#0e0e0e", "surface-container-low": "#1c1b1b",
+            "surface-container": "#201f1f", "surface-container-high": "#2a2a2a",
+            "surface-container-highest": "#353534", "surface-variant": "#353534",
+            "on-surface": "#e5e2e1", "on-surface-variant": "#e5bdbc",
+            "outline": "#ac8887", "outline-variant": "#5c403f",
+            "background": "#131313", "on-background": "#e5e2e1",
+            "inverse-surface": "#e5e2e1", "inverse-on-surface": "#313030",
+            "inverse-primary": "#be042b",
+          },
+          borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          spacing: {
+            "margin-desktop": "24px", "stack-sm": "12px", "stack-md": "24px",
+            "stack-lg": "48px", "gutter": "24px", "container-max": "1200px",
+          },
+          fontFamily: { "display-xl": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"], "headline-md": ["Hanken Grotesk"], "body-lg": ["Hanken Grotesk"], "body-md": ["Hanken Grotesk"], "label-md": ["Hanken Grotesk"] },
+          fontSize: {
+            "headline-xl": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "700" }],
+            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "700" }],
+            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "600" }],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    body { background-color: #131313; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #131313; }
+    ::-webkit-scrollbar-thumb { background: #3d3d3d; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #bf052b; }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-on-primary-container">
+
+  <!-- Navigation -->
+  <header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50 border-b border-surface-variant/30">
+    <div class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-container-max mx-auto">
+      <div class="flex items-center gap-12">
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary tracking-tighter">MMDb</a>
+        <nav class="hidden md:flex items-center gap-8">
+          <a href="places-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-label-md text-label-md">Places</a>
+          <a href="dishes-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-label-md text-label-md">Dishes</a>
+          <a href="guides-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-label-md text-label-md">Guides</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-6">
+        <div class="relative hidden lg:block">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary">search</span>
+          <input class="bg-surface-container-low border border-outline-variant rounded-full pl-10 pr-4 py-2 text-label-md focus:outline-none focus:border-primary-container w-64 transition-all" placeholder="Search curated tastes…" type="text" />
+        </div>
+        <a href="concierge-light.html" class="hover:opacity-80 transition-opacity flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary">light_mode</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="relative min-h-[calc(100vh-80px)] overflow-hidden">
+    <!-- Background -->
+    <div class="absolute inset-0 z-0">
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background z-10"></div>
+      <img class="w-full h-full object-cover opacity-30 grayscale"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnWABp-3BfI_dVmx49TPi1Asksn27x184Nk2TMLrEKpEJgVJfR8rh7Iwh5EpyfdeSvkQ3_jTlqLE4HTRNoHLZolTUjAFlxsZ1WDews02RnPzhej_92Rw2XRBrvPVbFkpiJQcZ6xRoql-00Alzxkyui5pT2GYxHU7XRxNcsFNwV7eV1CSolyG93V0skBpunkfek9kmQ14T5NAuNaPX8rECzv7AN3TWo3qpU6_6Q4ap81aCIatBfm4eMlyQDq5UtXsGf3NUOlo8pR4Y"
+        alt="Cinematic kitchen interior, moody and dark" />
+    </div>
+
+    <div class="relative z-20 max-w-[1200px] mx-auto px-margin-desktop py-12 h-full grid grid-cols-1 lg:grid-cols-12 gap-12">
+
+      <!-- Left: Chat -->
+      <div class="lg:col-span-7 flex flex-col h-[750px] bg-surface-container-low/40 backdrop-blur-xl rounded-xl border border-outline-variant/30 overflow-hidden">
+        <div class="p-6 border-b border-outline-variant/20 flex items-center gap-4 bg-surface-container-high/50">
+          <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
+            <span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1">auto_awesome</span>
+          </div>
+          <div>
+            <h2 class="font-headline-md text-headline-md leading-tight">Culinary Assistant</h2>
+            <p class="text-secondary text-label-md font-label-md">AI-Powered Gastronomy Concierge</p>
+          </div>
+        </div>
+
+        <div class="flex-grow overflow-y-auto p-6 space-y-8">
+          <!-- Bot -->
+          <div class="flex gap-4 max-w-[85%]">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center">
+              <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1">auto_awesome</span>
+            </div>
+            <div class="bg-surface-container-high p-4 rounded-xl rounded-tl-none">
+              <p class="font-body-md text-body-md">Good evening. I've curated a selection of modern European bistro experiences that emphasise local textures and high-contrast flavour profiles. Based on your preference for obsidian-mood interiors and precision cooking, these three represent the peak of the current scene.</p>
+            </div>
+          </div>
+          <!-- User -->
+          <div class="flex gap-4 max-w-[85%] ml-auto flex-row-reverse">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-container flex items-center justify-center">
+              <span class="material-symbols-outlined text-[18px] text-on-primary-container" style="font-variation-settings: 'FILL' 1">person</span>
+            </div>
+            <div class="bg-primary-container/20 border border-primary-container/30 p-4 rounded-xl rounded-tr-none text-right">
+              <p class="font-body-md text-body-md">Tell me more about the technical precision at 'L'Éclat'. Do they focus on molecular techniques?</p>
+            </div>
+          </div>
+          <!-- Bot -->
+          <div class="flex gap-4 max-w-[85%]">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center">
+              <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1">auto_awesome</span>
+            </div>
+            <div class="bg-surface-container-high p-4 rounded-xl rounded-tl-none">
+              <p class="font-body-md text-body-md">Indeed. Chef Aris focuses on 'Reductive Precision'. Their signature dish utilises liquid nitrogen to create a brittle crimson beet shell that encases a warm, earthy walnut foam. It's a study in thermal and textural contrast.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="p-6 bg-surface-container-low">
+          <div class="relative flex items-center">
+            <input class="w-full bg-surface-container-highest border border-outline-variant/30 rounded-xl px-6 py-4 pr-16 focus:outline-none focus:border-primary-container transition-all text-body-md font-body-md" placeholder="Ask about ingredients, techniques, or reservations…" type="text" />
+            <button class="absolute right-4 w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center hover:opacity-90 transition-opacity active:scale-95">
+              <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1">send</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Recommendation Cards -->
+      <div class="lg:col-span-5 flex flex-col gap-6">
+        <h3 class="font-headline-md text-headline-md border-l-4 border-primary-container pl-4">Tonight's Selections</h3>
+
+        <!-- Featured card -->
+        <div class="bg-surface-container-low border border-outline-variant/30 rounded-xl overflow-hidden group hover:border-primary-container/50 transition-all">
+          <div class="h-48 relative overflow-hidden">
+            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTMxOyk-TcmfyDxs77B6CMFr29fndTVSO-TwYx7jjOiKRWrotEWpN2foIlw8kvAlDaNrfRABs3d9lz1euy2Hy4nP3z9u0OTsUHGBPM35lFPR98OQxfVDKarp-GqMrLLgPxGEnhLnf4_uIizLcXG-OpimP1WjNBCXSKrUcvmyw14ljeCjWkGjFiTkSqHSszrJCDvlMrKV41qzFvLp2asYjhQICVa-yBORSewmXBb3Lk5wSYsQBa4tp9UU_L_Y6vIoytMEk_53DZpe8"
+              alt="Precision plated dish on black ceramic, dramatic lighting" />
+            <div class="absolute top-4 right-4 bg-primary-container text-white px-3 py-1 rounded-full text-label-md font-label-md">Top Match</div>
+          </div>
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-2">
+              <h4 class="font-headline-md text-headline-md">L'Éclat Noir</h4>
+              <span class="text-primary font-bold">4.9 ★</span>
+            </div>
+            <p class="text-secondary font-body-md mb-6">Experimental French cuisine with a focus on high-contrast plating and reductive techniques.</p>
+            <div class="flex gap-4">
+              <div class="flex flex-col">
+                <span class="text-secondary font-label-md text-[10px] uppercase tracking-widest">Prep Style</span>
+                <span class="text-on-surface font-label-md">Precision</span>
+              </div>
+              <div class="w-px h-8 bg-outline-variant/30"></div>
+              <div class="flex flex-col">
+                <span class="text-secondary font-label-md text-[10px] uppercase tracking-widest">Atmosphere</span>
+                <span class="text-on-surface font-label-md">Nocturnal</span>
+              </div>
+              <div class="ml-auto">
+                <button class="px-6 py-2 bg-primary-container text-white rounded-lg font-label-md hover:brightness-110 active:scale-95 transition-all">Reserve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary grid -->
+        <div class="grid grid-cols-2 gap-6">
+          <div class="bg-surface-container-low border border-outline-variant/30 rounded-xl p-5 hover:bg-surface-container-high transition-colors">
+            <div class="w-12 h-12 rounded-lg bg-surface-container-highest mb-4 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary">restaurant</span>
+            </div>
+            <h5 class="font-headline-md text-[18px] mb-1">Marrow &amp; Coal</h5>
+            <p class="text-secondary text-label-md">Industrial smoke-house with artisan charcuterie.</p>
+          </div>
+          <div class="bg-surface-container-low border border-outline-variant/30 rounded-xl p-5 hover:bg-surface-container-high transition-colors">
+            <div class="w-12 h-12 rounded-lg bg-surface-container-highest mb-4 flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary">wine_bar</span>
+            </div>
+            <h5 class="font-headline-md text-[18px] mb-1">Velvet Cellar</h5>
+            <p class="text-secondary text-label-md">Exclusive curation of deep reds and vintage spirits.</p>
+          </div>
+        </div>
+
+        <!-- AI Insight -->
+        <div class="p-4 bg-primary-container/10 border-l-2 border-primary-container rounded-r-xl">
+          <div class="flex items-center gap-3 mb-1">
+            <span class="material-symbols-outlined text-primary text-[20px]">lightbulb</span>
+            <span class="text-primary font-label-md">Maven Insight</span>
+          </div>
+          <p class="text-on-surface-variant font-label-md">"The texture profile at 'L'Éclat Noir' perfectly matches your recent high-contrast dinner reviews."</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface-container-low mt-12 border-t border-outline-variant/10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-stack-lg px-margin-desktop py-stack-lg w-full max-w-container-max mx-auto">
+      <div>
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary">MMDb</a>
+        <p class="mt-4 text-secondary font-body-md text-body-md pr-12">© 2024 MMDb. The Maven's Guide to Culinary Excellence.</p>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="flex flex-col gap-3">
+          <h6 class="font-label-md text-label-md text-on-surface uppercase tracking-widest mb-2">Explore</h6>
+          <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md hover:underline" href="#">About MMDb</a>
+          <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md hover:underline" href="#">Editorial Policy</a>
+        </div>
+        <div class="flex flex-col gap-3">
+          <h6 class="font-label-md text-label-md text-on-surface uppercase tracking-widest mb-2">Connect</h6>
+          <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md hover:underline" href="#">Newsletter</a>
+          <a class="text-secondary hover:text-primary transition-colors font-label-md text-label-md hover:underline" href="#">Contact</a>
+        </div>
+      </div>
+      <div>
+        <h6 class="font-label-md text-label-md text-on-surface uppercase tracking-widest mb-4">Precision Alerts</h6>
+        <div class="flex gap-2">
+          <input class="bg-surface-container-high border border-outline-variant/30 rounded-lg px-4 py-2 text-label-md focus:outline-none focus:border-primary-container flex-grow" placeholder="Maven Email" type="email" />
+          <button class="bg-primary-container text-white px-4 py-2 rounded-lg font-label-md hover:brightness-110 transition-all">Join</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

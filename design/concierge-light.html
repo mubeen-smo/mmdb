@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MMDb — Ask MMDb (Light)</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#93001e", "primary-container": "#bf052b",
+            "on-primary": "#ffffff", "on-primary-container": "#ffcdcc",
+            "primary-fixed": "#ffdad8", "primary-fixed-dim": "#ffb3b1",
+            "on-primary-fixed": "#410008",
+            "secondary": "#5f5e5e", "secondary-container": "#e2dfde",
+            "on-secondary": "#ffffff", "on-secondary-container": "#636262",
+            "secondary-fixed-dim": "#c8c6c5",
+            "tertiary": "#464746", "tertiary-container": "#5e5f5e",
+            "on-tertiary": "#ffffff", "on-tertiary-container": "#dad9d7",
+            "surface": "#fbf9f8", "surface-bright": "#fbf9f8", "surface-dim": "#dbdad9",
+            "surface-container-lowest": "#ffffff", "surface-container-low": "#f5f3f3",
+            "surface-container": "#efeded", "surface-container-high": "#e9e8e7",
+            "surface-container-highest": "#e4e2e2", "surface-variant": "#e4e2e2",
+            "on-surface": "#1b1c1c", "on-surface-variant": "#5c403f",
+            "outline": "#906f6e", "outline-variant": "#e5bdbc",
+            "background": "#fbf9f8", "on-background": "#1b1c1c",
+            "inverse-surface": "#303031", "inverse-on-surface": "#f2f0f0",
+          },
+          borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          spacing: {
+            "margin-desktop": "48px", "margin-mobile": "16px",
+            "stack-sm": "12px", "stack-md": "24px", "stack-lg": "48px",
+            "gutter": "24px", "container-max": "1280px",
+          },
+          fontFamily: {
+            "display-xl": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"],
+            "headline-md": ["Hanken Grotesk"], "body-lg": ["Inter"],
+            "body-md": ["Inter"], "label-sm": ["Inter"],
+          },
+          fontSize: {
+            "display-xl": ["60px", { lineHeight: "72px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "headline-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.01em", fontWeight: "700" }],
+            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    .glass-panel { background: rgba(251,249,248,0.7); backdrop-filter: blur(12px); }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #e4e2e2; border-radius: 10px; }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-hidden">
+
+  <!-- Navigation -->
+  <header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-container-max mx-auto">
+      <div class="flex items-center gap-8">
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary tracking-tighter">MMDb</a>
+        <nav class="hidden md:flex items-center gap-6">
+          <a href="places-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-label-sm text-label-sm">Places</a>
+          <a href="dishes-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-label-sm text-label-sm">Dishes</a>
+          <a href="guides-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-label-sm text-label-sm">Guides</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="relative hidden sm:block">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-lg">search</span>
+          <input class="bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-label-sm w-64 focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Search curated tastes…" type="text" />
+        </div>
+        <a href="concierge-dark.html" class="hover:opacity-80 transition-opacity">
+          <span class="material-symbols-outlined text-secondary">dark_mode</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Canvas -->
+  <main class="flex-grow flex relative overflow-hidden">
+    <!-- Background -->
+    <div class="absolute inset-0 z-0 opacity-10 pointer-events-none">
+      <img class="w-full h-full object-cover"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1-Wt8qvgiMyj25cvnwddYWvkbfDLfZ00NsU0wtckOBOihEXnddSx66HBszmylMXpNZwX2Emr-lO8W7H1ZfX-gJxsNDJiLqtCuIa9FgKofGUF7rBEW8kHKpHw1_hUcrHQ6J9kAOGk-lcKQNiI76c80NqJcndL4sBEvpIoOGzahbfNHYxEj4ID9t4B4pwisVQ_aqqnYoKhgM0ExdLIoGVK4t6LQjQaJftmB-DQQiP224U-5I2ZPN4xlzf6t0r-Garrx-SMMzE82CZc"
+        alt="Soft-focus fine dining interior with polished silverware" />
+    </div>
+
+    <div class="flex w-full max-w-container-max mx-auto relative z-10 px-margin-desktop gap-gutter py-stack-md h-[calc(100vh-80px)]">
+
+      <!-- Left: Chat -->
+      <section class="flex-grow flex flex-col glass-panel rounded-xl shadow-sm overflow-hidden max-w-3xl">
+        <!-- Chat header -->
+        <div class="p-stack-sm border-b border-surface-container-highest flex items-center justify-between bg-surface-container-low/50">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
+              <span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1">auto_awesome</span>
+            </div>
+            <div>
+              <h2 class="font-headline-md text-headline-md leading-tight">Culinary Assistant</h2>
+              <p class="font-label-sm text-label-sm text-secondary">Powered by MMDb Maven AI</p>
+            </div>
+          </div>
+          <button class="text-secondary hover:text-primary transition-colors">
+            <span class="material-symbols-outlined">more_vert</span>
+          </button>
+        </div>
+
+        <!-- Messages -->
+        <div class="flex-grow overflow-y-auto p-stack-md flex flex-col gap-stack-md">
+          <!-- Bot -->
+          <div class="flex gap-4 max-w-[85%]">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-container flex items-center justify-center">
+              <span class="material-symbols-outlined text-on-primary-container text-sm" style="font-variation-settings: 'FILL' 1">auto_awesome</span>
+            </div>
+            <div class="bg-surface-container-high rounded-xl p-4">
+              <p class="font-body-md text-on-surface">Bonjour! I am your MMDb Concierge. I've analysed your recent interest in modern French techniques and the vibrant Tokyo bistro scene. Are you looking for a specific reservation tonight, or perhaps a guide to the new 'Neo-Brasserie' movement?</p>
+            </div>
+          </div>
+          <!-- User -->
+          <div class="flex gap-4 flex-row-reverse max-w-[85%] self-end">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
+              <span class="material-symbols-outlined text-on-secondary-container text-sm" style="font-variation-settings: 'FILL' 1">person</span>
+            </div>
+            <div class="bg-primary-container text-on-primary-container rounded-xl p-4 shadow-sm">
+              <p class="font-body-md">I'm looking for a restaurant in Paris that balances classic heritage with minimalist plating. Somewhere quiet enough for a conversation but with a 10/10 rating for its wine list.</p>
+            </div>
+          </div>
+          <!-- Bot -->
+          <div class="flex gap-4 max-w-[85%]">
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-container flex items-center justify-center">
+              <span class="material-symbols-outlined text-on-primary-container text-sm" style="font-variation-settings: 'FILL' 1">auto_awesome</span>
+            </div>
+            <div class="bg-surface-container-high rounded-xl p-4">
+              <p class="font-body-md text-on-surface">Excellent choice. For that specific intersection of heritage and minimalism, I have curated three exceptional recommendations. I've focused on establishments that hold the 'Maven Seal' for their cellar depth. View them in your Selections panel to the right.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div class="p-stack-md border-t border-surface-container-highest">
+          <div class="flex items-center gap-3 bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant/30 focus-within:border-primary-container transition-all">
+            <span class="material-symbols-outlined text-secondary">mic</span>
+            <input class="flex-grow bg-transparent border-none focus:ring-0 text-body-md py-2 outline-none" placeholder="Ask for a table, a recipe, or a wine pairing…" type="text" />
+            <button class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary hover:scale-105 active:scale-95 transition-all">
+              <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">send</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Selections -->
+      <aside class="hidden lg:flex flex-col w-[400px] gap-stack-sm">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-headline-md text-headline-md">Maven Selections</h3>
+          <span class="text-primary font-label-sm text-label-sm px-2 py-1 bg-primary/10 rounded-full">3 Found</span>
+        </div>
+        <div class="flex flex-col gap-gutter overflow-y-auto pr-2 pb-10">
+
+          <!-- Card 1 -->
+          <div class="bg-surface-container-low rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group">
+            <div class="h-40 overflow-hidden relative">
+              <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuANwquQOPf-xKPrcgxlpklLpEsvjXzMShOkUVYFmaHd_91jjPtf49pjyu1Wjc1e9pJ1mRvMmDS6MmyjfvEFuM7kEgXnpFYlyTXlHemf0z1ZplMzfz61zdYTycW7XTI7XiMXPTxIf-fx7wy7_7Vpv6fU9IppyKZ51KlI0LDfnJckXr2lXLUyUDv9yD2TR2t5qTE4bgJfkieDtbOOOvm8_XTfXSfxXQt40SSFeVwxfdpak2ariHvtrzIOLRGvW2GdHfv8qngK5W-tYfM"
+                alt="Minimalist scallop dish on white ceramic" />
+              <div class="absolute top-3 left-3 bg-primary text-on-primary px-3 py-1 rounded-full text-label-sm font-bold">10/10</div>
+            </div>
+            <div class="p-4">
+              <span class="text-primary font-label-sm text-label-sm uppercase tracking-wider">Heritage Contemporary</span>
+              <h4 class="font-headline-md text-on-surface mt-1">L'Art de Vivre</h4>
+              <p class="font-body-md text-secondary text-sm mt-2 line-clamp-2">A masterclass in restraint. The wine list spans 400 years of French viticulture with rare vertical tastings.</p>
+              <div class="flex items-center gap-2 mt-4 pt-4 border-t border-surface-container-highest">
+                <button class="flex-grow bg-primary py-2 rounded-lg text-on-primary font-label-sm text-label-sm hover:bg-primary-container transition-colors">Book Table</button>
+                <button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container-high transition-colors">
+                  <span class="material-symbols-outlined text-secondary text-sm">bookmark</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-surface-container-low rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group">
+            <div class="h-40 overflow-hidden relative">
+              <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkAG7nnmv09J_UdR9lmol8x2vM5S4yGz1l4FBM6R0wEEk-fIxP3CEJndQQoso6cGJ1i1FTbmLZoKZudwUzqrzIJKDDFDiro6S_xe5lmrxj_Ty4Ct1j61fvi9tdOM4woe4MF1KjIStTIQr-b4Yx2Z_B8QsuBtgW1nilZg3N-KH5zK85-9YFO--DPk-su0i_2clZkt0GqrqqD8O59m6aisjHzKbwUEXQIAxl6VwEA0DQrYkPHTUYsDu4Lp0OJKmQDQ3fKxden9JTmQY"
+                alt="Atmospheric wine cellar with oak barrels" />
+              <div class="absolute top-3 left-3 bg-primary text-on-primary px-3 py-1 rounded-full text-label-sm font-bold">9.8/10</div>
+            </div>
+            <div class="p-4">
+              <span class="text-primary font-label-sm text-label-sm uppercase tracking-wider">Minimalist Bistro</span>
+              <h4 class="font-headline-md text-on-surface mt-1">Sureau Paris</h4>
+              <p class="font-body-md text-secondary text-sm mt-2 line-clamp-2">Where the forest meets the city. Expect hyper-seasonal ingredients and a focus on biodynamic purity.</p>
+              <div class="flex items-center gap-2 mt-4 pt-4 border-t border-surface-container-highest">
+                <button class="flex-grow bg-primary py-2 rounded-lg text-on-primary font-label-sm text-label-sm hover:bg-primary-container transition-colors">Book Table</button>
+                <button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container-high transition-colors">
+                  <span class="material-symbols-outlined text-secondary text-sm">bookmark</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-surface-container-low rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all group">
+            <div class="h-40 overflow-hidden relative">
+              <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnCGa3vLx4D3P7e5vzVSZTqRCmFe6vtOS3wq5hLRIaNiMwKPgk7KPwBPnTDOaurmFa7JV4vKFMp7q1hVNe1anYJIFOzsPBPSttNoJyvgMY2S3N4_u7z7mZUEVIwVqF60rMqxruAWxqRLXmdk1EiALw7MtQCy0ze63h6v5lfGPYyMVHbfeCZXcjxPI_yahf-tb1E7SC9P4Nq2-x_luof5kVyxyoNXY14CqF8xP6dgC3zskw_NohKjIj1JH4b8wLD2ZA_wZY7YI7R88"
+                alt="Airy Parisian dining room with cherry blossom stems" />
+              <div class="absolute top-3 left-3 bg-primary text-on-primary px-3 py-1 rounded-full text-label-sm font-bold">9.5/10</div>
+            </div>
+            <div class="p-4">
+              <span class="text-primary font-label-sm text-label-sm uppercase tracking-wider">Modern Classic</span>
+              <h4 class="font-headline-md text-on-surface mt-1">Pavillon</h4>
+              <p class="font-body-md text-secondary text-sm mt-2 line-clamp-2">An architectural marvel serving reimagined Escoffier. The terrace offers the quietest view in the 8th Arrondissement.</p>
+              <div class="flex items-center gap-2 mt-4 pt-4 border-t border-surface-container-highest">
+                <button class="flex-grow bg-primary py-2 rounded-lg text-on-primary font-label-sm text-label-sm hover:bg-primary-container transition-colors">Book Table</button>
+                <button class="p-2 border border-outline-variant rounded-lg hover:bg-surface-container-high transition-colors">
+                  <span class="material-symbols-outlined text-secondary text-sm">bookmark</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface-container-low w-full border-t border-surface-container-highest">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-stack-lg px-margin-desktop py-stack-sm w-full max-w-container-max mx-auto items-center">
+      <div class="flex items-center gap-4">
+        <span class="font-display-xl text-headline-md font-extrabold text-primary">MMDb</span>
+        <span class="font-label-sm text-label-sm text-secondary">© 2024 MMDb. The Maven's Guide to Culinary Excellence.</span>
+      </div>
+      <div class="flex justify-center gap-6">
+        <a class="text-secondary hover:text-primary transition-colors font-label-sm text-label-sm hover:underline" href="#">About</a>
+        <a class="text-secondary hover:text-primary transition-colors font-label-sm text-label-sm hover:underline" href="#">Editorial Policy</a>
+        <a class="text-secondary hover:text-primary transition-colors font-label-sm text-label-sm hover:underline" href="#">Newsletter</a>
+      </div>
+      <div class="flex justify-end gap-4">
+        <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-primary">language</span>
+        <span class="material-symbols-outlined text-secondary cursor-pointer hover:text-primary">settings</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

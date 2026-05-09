@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MMDb — Guides (Light)</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700;800&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#93001e", "primary-container": "#bf052b",
+            "on-primary": "#ffffff", "on-primary-container": "#ffcdcc",
+            "primary-fixed": "#ffdad8", "primary-fixed-dim": "#ffb3b1",
+            "on-primary-fixed": "#410008",
+            "secondary": "#5f5e5e", "secondary-container": "#e2dfde",
+            "on-secondary": "#ffffff", "on-secondary-container": "#636262",
+            "tertiary": "#464746", "tertiary-container": "#5e5f5e",
+            "on-tertiary": "#ffffff",
+            "surface": "#fbf9f8", "surface-bright": "#fbf9f8",
+            "surface-container-lowest": "#ffffff", "surface-container-low": "#f5f3f3",
+            "surface-container": "#efeded", "surface-container-high": "#e9e8e7",
+            "surface-container-highest": "#e4e2e2", "surface-variant": "#e4e2e2",
+            "on-surface": "#1b1c1c", "on-surface-variant": "#5c403f",
+            "outline": "#906f6e", "outline-variant": "#e5bdbc",
+            "background": "#fbf9f8", "on-background": "#1b1c1c",
+          },
+          borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          spacing: {
+            "margin-desktop": "48px", "stack-sm": "12px", "stack-md": "24px",
+            "stack-lg": "48px", "gutter": "24px", "container-max": "1280px",
+          },
+          fontFamily: {
+            "display-xl": ["Hanken Grotesk"], "headline-lg": ["Hanken Grotesk"],
+            "headline-md": ["Hanken Grotesk"], "body-lg": ["Inter"],
+            "body-md": ["Inter"], "label-sm": ["Inter"],
+          },
+          fontSize: {
+            "display-xl": ["60px", { lineHeight: "72px", letterSpacing: "-0.02em", fontWeight: "800" }],
+            "headline-lg": ["40px", { lineHeight: "48px", letterSpacing: "-0.01em", fontWeight: "700" }],
+            "headline-md": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+            "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+            "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md">
+
+  <!-- Navigation -->
+  <header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="flex justify-between items-center px-margin-desktop py-4 w-full max-w-container-max mx-auto">
+      <div class="flex items-center gap-stack-md">
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary tracking-tighter">MMDb</a>
+        <nav class="hidden md:flex items-center gap-6 ml-8">
+          <a href="places-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-label-sm text-label-sm">Places</a>
+          <a href="dishes-light.html" class="text-secondary font-medium hover:text-primary transition-colors font-label-sm text-label-sm">Dishes</a>
+          <a href="#" class="text-primary font-bold border-b-2 border-primary pb-1 font-label-sm text-label-sm">Guides</a>
+        </nav>
+      </div>
+      <button class="p-2 rounded-full hover:bg-surface-container transition-colors">
+        <span class="material-symbols-outlined text-secondary">dark_mode</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-container-max mx-auto px-margin-desktop py-stack-lg">
+
+    <!-- Hero -->
+    <section class="mb-stack-lg">
+      <h1 class="font-display-xl text-display-xl text-primary mb-2">Culinary Guides</h1>
+      <p class="font-body-lg text-body-lg text-secondary max-w-2xl">Discover our strictly vetted editorial guides and in-depth reviews of exceptional dining establishments, where atmosphere meets unparalleled technical execution.</p>
+    </section>
+
+    <!-- Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+
+      <!-- Le Petit Céleste — hero card -->
+      <div class="md:col-span-8 group cursor-pointer">
+        <a href="restaurant-light.html" class="block bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(147,0,30,0.06)] hover:-translate-y-1">
+          <div class="aspect-[16/9] w-full relative">
+            <img class="w-full h-full object-cover"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBM8Ogf8QIYpbsVxItrQPY6J7tiq5CKUNVMBB2uS8SRpobdHxAAWD1PVQjzAZJri-ISJPVUYrOmp_tEYQ0wAE02FUOeJ_ijn_H-ZaWndcODkF6FeaSeDzr83mHJXNETU8gMTEuEJ3aAeCj0BjYj_Z2RdbDKJVlz1ijjIDIvbT3Jg6M3Vn4_ySZgLWjnT9Hqp_UaJv0LL_frYm83hucdCfK8EyiqBTCzKbMw5ShMyG5Vg8B2sb0gIA3hAyNdgtjj5sbldrBJk27ScZE"
+              alt="Le Petit Céleste — minimalist Parisian dining room at twilight" />
+            <div class="absolute top-4 left-4 bg-primary px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+              <span class="material-symbols-outlined text-white text-[16px]" style="font-variation-settings: 'FILL' 1">star</span>
+              <span class="text-white font-bold font-label-sm text-label-sm">9.8</span>
+            </div>
+          </div>
+          <div class="p-stack-md">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <span class="text-primary font-bold font-label-sm text-label-sm tracking-wider uppercase">Paris, 1er</span>
+                <h3 class="font-headline-lg text-headline-lg mt-1">Le Petit Céleste</h3>
+              </div>
+            </div>
+            <p class="text-secondary font-body-md text-body-md line-clamp-2 max-w-2xl mb-4">A celestial journey through contemporary French gastronomy, where Chef Julianne Moreau redefines traditional techniques with airy, ethereal textures and seasonal purity.</p>
+            <div class="flex gap-2">
+              <span class="bg-surface-container-highest px-3 py-1 rounded-full text-secondary font-label-sm text-label-sm">Modern French</span>
+              <span class="bg-surface-container-highest px-3 py-1 rounded-full text-secondary font-label-sm text-label-sm">$$$$</span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- L'Obsidienne -->
+      <div class="md:col-span-4 group cursor-pointer">
+        <div class="bg-surface-container-low rounded-xl overflow-hidden h-full transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(147,0,30,0.06)] hover:-translate-y-1">
+          <div class="aspect-square w-full relative">
+            <img class="w-full h-full object-cover"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDg7f27PS-VRiqnZvSxVRjj59MG20oiQf4ZIEfMaZFkiKAUUuLYzPwwJTnnjdkarQpIr8H_-SZtg1HFkZMbd92vR-IP12AfZUlIs8dr7HIoT6UQGBygLXHrqk_XJYVIOIxQHOy0Hn3HWIDyy-ALZfZ3gToD9wS0_mU0QQXE9G6Jeu1vAo7xifi6hwkmLGDgU29MKESz_ed6xWQz5vs1dxvdlw0sGUsXaM7ZhMcX-tLxhF74zFtyjQh7j3hhfba3cBCduTexWu8-pAU"
+              alt="L'Obsidienne — dark volcanic stone bar interior" />
+            <div class="absolute top-4 left-4 bg-primary px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+              <span class="material-symbols-outlined text-white text-[16px]" style="font-variation-settings: 'FILL' 1">star</span>
+              <span class="text-white font-bold font-label-sm text-label-sm">9.4</span>
+            </div>
+          </div>
+          <div class="p-stack-md">
+            <span class="text-primary font-bold font-label-sm text-label-sm tracking-wider uppercase">Lyon</span>
+            <h3 class="font-headline-md text-headline-md mt-1">L'Obsidienne</h3>
+            <p class="text-secondary font-body-md text-body-md mt-2 line-clamp-3">The intersection of dark aesthetics and bright, vibrant flavours. A masterclass in contrasts.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sureau -->
+      <div class="md:col-span-6 group cursor-pointer">
+        <div class="bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(147,0,30,0.06)] hover:-translate-y-1 flex flex-col md:flex-row">
+          <div class="md:w-1/2 relative">
+            <img class="w-full h-full object-cover min-h-[300px]"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaw3L5KXNQVh_ejS4C7ZyJxAXHfc9K_gOZYjmWOru1gjJ7TdTj-ktLMDU3C2ZtulNwsg7fbVy3o2kwhH5CtJICLgVQjgZggwV9usHgPk2vatEejB-79YYjQUi_9UMKPr9IxGgsAa-3QN8L5mcTOkgIcN6MWHgg7W5lXT3HBWWZBjP_nljxAkU6ZbxBD6qWAFDGSymcWMV0zPkbasJjgwULolMaq4H1VRLBcFneFcKjckJONyf4JQTPjYc_Z_Dy4O6eHC4m68E8mO8"
+              alt="Sureau — sun-drenched interior with trailing plants" />
+          </div>
+          <div class="md:w-1/2 p-stack-md flex flex-col justify-center">
+            <div class="bg-primary-fixed w-fit px-2 py-0.5 rounded mb-2">
+              <span class="text-on-primary-fixed font-bold font-label-sm text-label-sm">9.6</span>
+            </div>
+            <span class="text-primary font-bold font-label-sm text-label-sm tracking-wider uppercase">Bordeaux</span>
+            <h3 class="font-headline-md text-headline-md mt-1">Sureau</h3>
+            <p class="text-secondary font-body-md text-body-md mt-4">A botanical ode to the elderflower, celebrating hyper-local terroir through a progressive foraged-menu approach.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pavillon -->
+      <div class="md:col-span-6 group cursor-pointer">
+        <div class="bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(147,0,30,0.06)] hover:-translate-y-1 flex flex-col md:flex-row">
+          <div class="md:w-1/2 relative">
+            <img class="w-full h-full object-cover min-h-[300px]"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwPMko_moll1fAH8R1pNeFcnBMBz792VoYMislgATghRTM7nGLvXxqcwbSxCIx_r-Xe_fRKX3q1VMr7F5GVcqxZkNzQhb_sM8BUxxufkln2dZYF6fjVSs4DU6fFJaIWGZ-rww_-m6CA77KJ7-ZZvvXtp1WgMGpFtFzCkM8"
+              alt="Pavillon — glass pavilion glowing at night in formal gardens" />
+          </div>
+          <div class="md:w-1/2 p-stack-md flex flex-col justify-center">
+            <div class="bg-primary-fixed w-fit px-2 py-0.5 rounded mb-2">
+              <span class="text-on-primary-fixed font-bold font-label-sm text-label-sm">9.5</span>
+            </div>
+            <span class="text-primary font-bold font-label-sm text-label-sm tracking-wider uppercase">Paris, 8ème</span>
+            <h3 class="font-headline-md text-headline-md mt-1">Pavillon</h3>
+            <p class="text-secondary font-body-md text-body-md mt-4">Stately dining reimagined for the modern maven. Grandeur without the pretence, focusing on pure, unadulterated product excellence.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-surface-container-low border-t border-surface-container-high mt-stack-lg">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-stack-lg px-margin-desktop py-stack-lg w-full max-w-container-max mx-auto">
+      <div class="space-y-4">
+        <a href="index.html" class="font-display-xl text-headline-md font-extrabold text-primary block">MMDb</a>
+        <p class="font-body-md text-body-md text-secondary">© 2024 MMDb. The Maven's Guide to Culinary Excellence.</p>
+      </div>
+      <div class="flex flex-col gap-2">
+        <h4 class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-2">Editorial</h4>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">About MMDb</a>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">Editorial Policy</a>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">Contact</a>
+      </div>
+      <div class="flex flex-col gap-2">
+        <h4 class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-2">Connect</h4>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">Newsletter</a>
+        <a class="text-secondary hover:text-primary transition-colors hover:underline font-body-md text-body-md" href="#">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- AI Concierge FAB -->
+  <a href="concierge-light.html" class="fixed bottom-8 right-8 z-50 flex items-center justify-center bg-primary text-on-primary rounded-full w-14 h-14 shadow-lg hover:shadow-xl hover:scale-110 transition-transform duration-300 active:scale-90 group relative">
+    <span class="material-symbols-outlined text-[24px]">auto_awesome</span>
+    <span class="absolute right-16 bg-primary text-white px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity font-label-sm whitespace-nowrap pointer-events-none">Ask Maven AI</span>
+  </a>
+
+</body>
+</html>
