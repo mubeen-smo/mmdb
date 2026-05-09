@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { restaurants } from "@/lib/data";
-import type { Restaurant } from "@/types";
+import { getPlaces } from "@/lib/api";
+import type { ApiPlace } from "@/types";
 
 export const metadata: Metadata = { title: "Places" };
 
@@ -20,36 +19,36 @@ function ScoreBar({ value }: { value: number }) {
   );
 }
 
-function RestaurantRow({ restaurant }: { restaurant: Restaurant }) {
+function PlaceRow({ place }: { place: ApiPlace }) {
+  const ambience = place.ambience_rating != null ? Number(place.ambience_rating) : null;
+  const service = place.service_rating != null ? Number(place.service_rating) : null;
+  const avgScore =
+    ambience != null && service != null
+      ? ((ambience + service) / 2).toFixed(1)
+      : ambience?.toFixed(1) ?? null;
+
   return (
-    <article className="group bg-surface-container-low rounded-xl overflow-hidden hover:shadow-[0_8px_30px_rgba(147,0,30,0.08)] transition-all duration-300 border border-transparent hover:border-outline-variant flex flex-col md:flex-row md:h-64">
-      <div className="w-full md:w-80 h-48 md:h-full shrink-0 overflow-hidden relative">
-        <Image
-          src={restaurant.image}
-          alt={restaurant.name}
-          fill
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
-        />
-      </div>
-      <div className="p-6 flex flex-col flex-grow">
-        <div className="flex justify-between items-start">
-          <div>
+    <article className="group bg-surface-container-low rounded-xl overflow-hidden hover:shadow-[0_8px_30px_rgba(147,0,30,0.08)] transition-all duration-300 border border-transparent hover:border-outline-variant p-6">
+      <div className="flex justify-between items-start mb-3">
+        <div>
+          {place.type && (
             <span className="type-label-sm text-[10px] text-primary uppercase tracking-widest block mb-1">
-              {restaurant.cuisine}
+              {place.type}
             </span>
-            <Link href={`/restaurants/${restaurant.slug}`}>
-              <h2 className="type-headline-md text-on-background hover:text-primary transition-colors">
-                {restaurant.name}
-              </h2>
-            </Link>
-            <p className="type-body-md text-secondary text-sm">
-              {restaurant.location}
-            </p>
-          </div>
+          )}
+          <Link href={`/places/${place.place_id}`}>
+            <h2 className="type-headline-md text-on-background hover:text-primary transition-colors">
+              {place.place_name}
+            </h2>
+          </Link>
+          {place.location && (
+            <p className="type-body-md text-secondary text-sm mt-0.5">{place.location}</p>
+          )}
+        </div>
+
+        {avgScore && (
           <div className="bg-surface-container-lowest border border-outline-variant rounded-lg px-3 py-1 flex items-center gap-1 shrink-0">
-            <span className="font-display text-xl font-bold text-primary">
-              {restaurant.score}
-            </span>
+            <span className="font-display text-xl font-bold text-primary">{avgScore}</span>
             <span
               className="material-symbols-outlined text-primary text-[16px] select-none"
               style={{ fontVariationSettings: "'FILL' 1" }}
@@ -57,32 +56,36 @@ function RestaurantRow({ restaurant }: { restaurant: Restaurant }) {
               star
             </span>
           </div>
-        </div>
+        )}
+      </div>
 
-        <p className="type-body-md text-on-surface-variant my-4 line-clamp-2 md:line-clamp-3">
-          {restaurant.description}
+      {place.description && (
+        <p className="type-body-md text-on-surface-variant my-3 line-clamp-2">
+          {place.description}
         </p>
+      )}
 
-        <div className="mt-auto flex flex-wrap gap-8">
+      <div className="mt-4 flex flex-wrap gap-8">
+        {ambience != null && (
           <div className="flex flex-col min-w-[120px]">
-            <span className="type-label-sm text-[10px] text-secondary uppercase mb-1">
-              Ambience
-            </span>
-            <ScoreBar value={restaurant.ambienceScore} />
+            <span className="type-label-sm text-[10px] text-secondary uppercase mb-1">Ambience</span>
+            <ScoreBar value={ambience} />
           </div>
+        )}
+        {service != null && (
           <div className="flex flex-col min-w-[120px]">
-            <span className="type-label-sm text-[10px] text-secondary uppercase mb-1">
-              Service
-            </span>
-            <ScoreBar value={restaurant.serviceScore} />
+            <span className="type-label-sm text-[10px] text-secondary uppercase mb-1">Service</span>
+            <ScoreBar value={service} />
           </div>
-        </div>
+        )}
       </div>
     </article>
   );
 }
 
-export default function PlacesPage() {
+export default async function PlacesPage() {
+  const { items: places, total } = await getPlaces();
+
   return (
     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pb-stack-lg">
 
@@ -93,9 +96,7 @@ export default function PlacesPage() {
             The Maven&apos;s Places
           </h1>
           <p className="type-body-lg text-secondary max-w-2xl leading-relaxed">
-            Our editors traverse the globe to identify dining establishments
-            that transcend mere sustenance. Each entry represents an apex of
-            technique, hospitality, and atmosphere.
+            Every place we have eaten at, ranked and reviewed. {total} entries in the directory.
           </p>
         </div>
       </section>
@@ -108,16 +109,16 @@ export default function PlacesPage() {
           </span>
           <input
             type="search"
-            placeholder="Search the directory of culinary excellence…"
+            placeholder="Search the directory…"
             className="bg-surface-container-low border-2 border-surface-variant rounded-xl pl-12 pr-4 py-4 type-body-md w-full focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
           />
         </div>
       </section>
 
-      {/* Restaurant list */}
+      {/* Place list */}
       <section className="flex flex-col gap-6">
-        {restaurants.map((r) => (
-          <RestaurantRow key={r.id} restaurant={r} />
+        {places.map((place) => (
+          <PlaceRow key={place.place_id} place={place} />
         ))}
       </section>
 

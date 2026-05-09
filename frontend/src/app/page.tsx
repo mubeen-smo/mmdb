@@ -1,26 +1,20 @@
 import Image from "next/image";
 import Link from "next/link";
-import { trendingDishes } from "@/lib/data";
-import type { Dish } from "@/types";
+import { getDishes } from "@/lib/api";
+import type { ApiDish } from "@/types";
 
-function DishCard({ dish }: { dish: Dish }) {
+function DishCard({ dish }: { dish: ApiDish }) {
   return (
-    <div className="group cursor-pointer bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_40px_rgba(147,0,30,0.06)] hover:-translate-y-2">
-      {dish.image && (
-        <div className="h-64 relative overflow-hidden">
-          <Image
-            src={dish.image}
-            alt={dish.name}
-            fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        </div>
-      )}
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-2">
+    <div className="group cursor-pointer bg-surface-container-low rounded-xl overflow-hidden transition-all duration-300 hover:shadow-[0_20px_40px_rgba(147,0,30,0.06)] hover:-translate-y-2 p-6">
+      <div className="flex justify-between items-start mb-3">
+        {dish.tags ? (
           <span className="type-label-sm text-primary uppercase tracking-wider">
-            {dish.cuisine}
+            {dish.tags}
           </span>
+        ) : (
+          <span />
+        )}
+        {dish.item_rating != null && (
           <div className="flex items-center gap-1 px-2 py-1 bg-surface-bright rounded-full">
             <span
               className="material-symbols-outlined text-primary text-[14px] select-none"
@@ -28,19 +22,30 @@ function DishCard({ dish }: { dish: Dish }) {
             >
               star
             </span>
-            <span className="type-label-sm text-on-surface">{dish.score}</span>
+            <span className="type-label-sm text-on-surface">
+              {dish.item_rating.toFixed(1)}
+            </span>
           </div>
-        </div>
-        <h3 className="type-headline-md text-on-surface group-hover:text-primary transition-colors">
-          {dish.name}
-        </h3>
-        <p className="type-body-md text-secondary mt-1">{dish.restaurant}</p>
+        )}
       </div>
+      <h3 className="type-headline-md text-on-surface group-hover:text-primary transition-colors">
+        {dish.item}
+      </h3>
+      {dish.place_name && (
+        <p className="type-body-md text-secondary mt-1">{dish.place_name}</p>
+      )}
+      {dish.description && (
+        <p className="type-body-md text-on-surface-variant mt-2 line-clamp-2 text-sm">
+          {dish.description}
+        </p>
+      )}
     </div>
   );
 }
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const { items: trendingDishes } = await getDishes({ limit: 3 });
+
   return (
     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pb-stack-lg">
 
@@ -100,7 +105,7 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {trendingDishes.map((dish) => (
-            <DishCard key={dish.id} dish={dish} />
+            <DishCard key={dish.item_id} dish={dish} />
           ))}
         </div>
       </section>
