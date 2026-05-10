@@ -1,71 +1,99 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { getDishes } from "@/lib/api";
+import { getDishes, dishImageUrl } from "@/lib/api";
 import type { ApiDish } from "@/types";
+
+function DishImage({ itemId, alt }: { itemId: number; alt: string }) {
+  const [hidden, setHidden] = useState(false);
+  if (hidden) return null;
+  return (
+    <div className="relative w-36 md:w-44 shrink-0 self-stretch">
+      <Image
+        src={dishImageUrl(itemId)}
+        alt={alt}
+        fill
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
+        sizes="(max-width: 768px) 144px, 176px"
+        onError={() => setHidden(true)}
+      />
+    </div>
+  );
+}
 
 function DishCard({ dish }: { dish: ApiDish }) {
   return (
-    <article className="group bg-surface-container-lowest rounded-2xl p-6 flex flex-col gap-4 border border-outline-variant/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_25px_-5px_rgba(147,0,30,0.1),0_8px_10px_-6px_rgba(147,0,30,0.1)] cursor-pointer">
-      <div className="flex justify-between items-start">
-        <div className="flex-grow pr-4">
-          <h3
-            className="text-on-surface group-hover:text-primary transition-colors mb-1"
-            style={{
-              fontFamily: "var(--font-display)",
-              fontWeight: 800,
-              lineHeight: 1.1,
-              letterSpacing: "-0.03em",
-              fontSize: "clamp(1.25rem, 2vw, 1.5rem)",
-            }}
-          >
-            {dish.item}
-          </h3>
-          {dish.place_name && (
-            <p className="type-body-md text-secondary italic">
-              {dish.place_id != null ? (
-                <Link
-                  href={`/places/${dish.place_id}`}
-                  className="hover:text-primary hover:underline transition-colors"
-                >
-                  {dish.place_name}
-                </Link>
-              ) : (
-                dish.place_name
-              )}
-            </p>
+    <article className="group bg-surface-container-lowest rounded-2xl overflow-hidden border border-outline-variant/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_25px_-5px_rgba(147,0,30,0.1),0_8px_10px_-6px_rgba(147,0,30,0.1)] cursor-pointer flex flex-row">
+
+      {/* Info */}
+      <div className="flex-grow p-6 flex flex-col gap-4 min-w-0">
+        <div className="flex justify-between items-start">
+          <div className="flex-grow pr-4 min-w-0">
+            <h3
+              className="text-on-surface group-hover:text-primary transition-colors mb-1"
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 800,
+                lineHeight: 1.1,
+                letterSpacing: "-0.03em",
+                fontSize: "clamp(1.25rem, 2vw, 1.5rem)",
+              }}
+            >
+              {dish.item}
+            </h3>
+            {dish.place_name && (
+              <p className="type-body-md text-secondary italic">
+                {dish.place_id != null ? (
+                  <Link
+                    href={`/places/${dish.place_id}`}
+                    className="hover:text-primary hover:underline transition-colors"
+                  >
+                    {dish.place_name}
+                  </Link>
+                ) : (
+                  dish.place_name
+                )}
+              </p>
+            )}
+          </div>
+          {dish.item_rating != null && (
+            <div className="flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-lg shrink-0">
+              <span
+                className="text-primary font-extrabold text-xl leading-none"
+                style={{ fontFamily: "var(--font-display)" }}
+              >
+                {dish.item_rating.toFixed(1)}
+              </span>
+              <span
+                className="material-symbols-outlined text-primary text-sm select-none"
+                style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}
+              >
+                star
+              </span>
+            </div>
           )}
         </div>
-        {dish.item_rating != null && (
-          <div className="flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-lg shrink-0">
-            <span
-              className="text-primary font-extrabold text-xl leading-none"
-              style={{ fontFamily: "var(--font-display)" }}
-            >
-              {dish.item_rating.toFixed(1)}
-            </span>
-            <span
-              className="material-symbols-outlined text-primary text-sm select-none"
-              style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}
-            >
-              star
+
+        {dish.description && (
+          <p className="type-body-md text-on-surface-variant text-sm line-clamp-2">
+            {dish.description}
+          </p>
+        )}
+
+        {dish.tags && (
+          <div className="mt-auto">
+            <span className="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full type-label-sm text-[11px] uppercase tracking-wider">
+              {dish.tags}
             </span>
           </div>
         )}
       </div>
-      {dish.description && (
-        <p className="type-body-md text-on-surface-variant text-sm line-clamp-2">
-          {dish.description}
-        </p>
-      )}
-      {dish.tags && (
-        <div>
-          <span className="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full type-label-sm text-[11px] uppercase tracking-wider">
-            {dish.tags}
-          </span>
-        </div>
-      )}
+
+      {/* Image — computed from item_id, hides silently on 404 */}
+      <DishImage itemId={dish.item_id} alt={dish.item} />
+
     </article>
   );
 }

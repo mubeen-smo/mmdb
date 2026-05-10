@@ -4,6 +4,9 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const REST = `${SUPABASE_URL}/rest/v1`;
 
+export const dishImageUrl = (itemId: number) =>
+  `${SUPABASE_URL}/storage/v1/object/public/media/items/${itemId}.png`;
+
 async function pgFetch<T>(
   table: string,
   qs: URLSearchParams,
