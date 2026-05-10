@@ -53,8 +53,8 @@ export function NavSearch() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => query.trim() && setOpen(true)}
-        placeholder="Search dishes, places…"
-        className="w-full bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 type-body-md text-on-surface placeholder:text-secondary/60 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+        placeholder="Search…"
+        className="w-full bg-surface-container-low border border-outline-variant/30 rounded-full py-2 pl-10 pr-4 type-body-md text-on-surface placeholder:text-secondary/60 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
       />
 
       {open && (

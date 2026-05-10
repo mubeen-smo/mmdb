@@ -22,33 +22,17 @@ export function ThemeToggle() {
     localStorage.setItem("theme", next ? "dark" : "light");
   }
 
-  if (!mounted) {
-    return <div className="w-[54px] h-[27px] rounded-full bg-surface-container-high" />;
-  }
+  if (!mounted) return <div className="w-10 h-10 rounded-full bg-surface-container-high" />;
 
   return (
-    <label className="theme-switch">
-      <input
-        className="theme-switch__input"
-        type="checkbox"
-        role="switch"
-        checked={dark}
-        onChange={toggle}
-      />
-      <span className="theme-switch__icon">
-        <span className="theme-switch__icon-part theme-switch__icon-part--1" />
-        <span className="theme-switch__icon-part theme-switch__icon-part--2" />
-        <span className="theme-switch__icon-part theme-switch__icon-part--3" />
-        <span className="theme-switch__icon-part theme-switch__icon-part--4" />
-        <span className="theme-switch__icon-part theme-switch__icon-part--5" />
-        <span className="theme-switch__icon-part theme-switch__icon-part--6" />
-        <span className="theme-switch__icon-part theme-switch__icon-part--7" />
-        <span className="theme-switch__icon-part theme-switch__icon-part--8" />
-        <span className="theme-switch__icon-part theme-switch__icon-part--9" />
-        <span className="theme-switch__icon-part theme-switch__icon-part--10" />
-        <span className="theme-switch__icon-part theme-switch__icon-part--11" />
+    <button
+      onClick={toggle}
+      aria-label="Toggle theme"
+      className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors text-on-surface-variant hover:text-on-surface"
+    >
+      <span className="material-symbols-outlined text-[22px] select-none">
+        {dark ? "bedtime" : "light_mode"}
       </span>
-      <span className="theme-switch__sr">Dark Mode</span>
-    </label>
+    </button>
   );
 }

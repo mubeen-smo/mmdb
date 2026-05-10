@@ -39,13 +39,13 @@ export function MobileSearch() {
       <button
         onClick={() => setOverlayOpen(true)}
         aria-label="Search"
-        className="md:hidden p-1 text-secondary hover:text-primary transition-colors"
+        className="lg:hidden p-1 text-secondary hover:text-primary transition-colors"
       >
         <span className="material-symbols-outlined text-[24px] select-none">search</span>
       </button>
 
       {overlayOpen && (
-        <div className="fixed inset-0 z-[60] bg-surface-container-lowest flex flex-col md:hidden">
+        <div className="fixed inset-0 z-[60] bg-surface-container-lowest flex flex-col lg:hidden">
           {/* Search bar */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-outline-variant/30 shrink-0">
             <span className="material-symbols-outlined text-secondary text-[22px] shrink-0 select-none">
@@ -56,7 +56,7 @@ export function MobileSearch() {
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search dishes, places…"
+              placeholder="Search…"
               className="flex-1 bg-transparent type-body-md text-on-surface placeholder:text-secondary/60 outline-none"
             />
             <button onClick={close} className="shrink-0 text-secondary hover:text-primary transition-colors">

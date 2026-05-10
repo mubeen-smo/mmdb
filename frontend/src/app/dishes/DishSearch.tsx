@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { getDishes } from "@/lib/api";
 import type { ApiDish } from "@/types";
 
 function DishCard({ dish }: { dish: ApiDish }) {
   return (
-    <article className="group bg-surface-container-lowest rounded-2xl p-6 flex flex-col gap-4 border border-outline-variant/20 transition-all duration-300 hover:shadow-[0_20px_25px_-5px_rgba(147,0,30,0.1),0_8px_10px_-6px_rgba(147,0,30,0.1)] cursor-pointer">
+    <article className="group bg-surface-container-lowest rounded-2xl p-6 flex flex-col gap-4 border border-outline-variant/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_25px_-5px_rgba(147,0,30,0.1),0_8px_10px_-6px_rgba(147,0,30,0.1)] cursor-pointer">
       <div className="flex justify-between items-start">
         <div className="flex-grow pr-4">
           <h3
@@ -22,7 +23,18 @@ function DishCard({ dish }: { dish: ApiDish }) {
             {dish.item}
           </h3>
           {dish.place_name && (
-            <p className="type-body-md text-secondary italic">{dish.place_name}</p>
+            <p className="type-body-md text-secondary italic">
+              {dish.place_id != null ? (
+                <Link
+                  href={`/places/${dish.place_id}`}
+                  className="hover:text-primary hover:underline transition-colors"
+                >
+                  {dish.place_name}
+                </Link>
+              ) : (
+                dish.place_name
+              )}
+            </p>
           )}
         </div>
         {dish.item_rating != null && (
@@ -35,7 +47,7 @@ function DishCard({ dish }: { dish: ApiDish }) {
             </span>
             <span
               className="material-symbols-outlined text-primary text-sm select-none"
-              style={{ fontVariationSettings: "'FILL' 1" }}
+              style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}
             >
               star
             </span>

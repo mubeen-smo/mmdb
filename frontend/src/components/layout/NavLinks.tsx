@@ -13,7 +13,7 @@ export function NavLinks() {
   const pathname = usePathname();
 
   return (
-    <ul className="hidden lg:flex items-center gap-6">
+    <ul className="hidden lg:flex items-center gap-8">
       {links.map(({ href, label }) => {
         const active = pathname === href || pathname.startsWith(href + "/");
         return (
@@ -23,7 +23,7 @@ export function NavLinks() {
               className={[
                 "type-body-md transition-colors duration-200 relative pb-1",
                 active
-                  ? "text-primary font-semibold after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-primary after:rounded-full"
+                  ? "text-primary font-bold border-b-2 border-primary"
                   : "text-secondary hover:text-primary",
               ].join(" ")}
             >

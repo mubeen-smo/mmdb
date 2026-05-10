@@ -25,7 +25,10 @@ function PlaceRow({ place }: { place: ApiPlace }) {
       : ambience?.toFixed(1) ?? null;
 
   return (
-    <article className="group bg-surface-container-low rounded-xl overflow-hidden hover:shadow-[0_8px_30px_rgba(147,0,30,0.08)] transition-all duration-300 border border-transparent hover:border-outline-variant p-6">
+    <Link
+      href={`/places/${place.place_id}`}
+      className="group block bg-surface-container-low rounded-xl border border-outline-variant/20 p-6 shadow-[0_4px_16px_rgba(147,0,30,0.04)] hover:-translate-y-2 hover:shadow-[0_20px_25px_-5px_rgba(147,0,30,0.1),0_8px_10px_-6px_rgba(147,0,30,0.1)] transition-all duration-300 cursor-pointer"
+    >
       <div className="flex justify-between items-start mb-3">
         <div>
           {place.type && (
@@ -33,11 +36,9 @@ function PlaceRow({ place }: { place: ApiPlace }) {
               {place.type}
             </span>
           )}
-          <Link href={`/places/${place.place_id}`}>
-            <h2 className="type-headline-md text-on-background hover:text-primary transition-colors">
-              {place.place_name}
-            </h2>
-          </Link>
+          <h2 className="type-headline-md text-on-background group-hover:text-primary transition-colors">
+            {place.place_name}
+          </h2>
           {place.location && (
             <p className="type-body-md text-secondary text-sm mt-0.5">{place.location}</p>
           )}
@@ -47,7 +48,7 @@ function PlaceRow({ place }: { place: ApiPlace }) {
             <span className="font-display text-xl font-bold text-primary">{avgScore}</span>
             <span
               className="material-symbols-outlined text-primary text-[16px] select-none"
-              style={{ fontVariationSettings: "'FILL' 1" }}
+              style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}
             >
               star
             </span>
@@ -73,7 +74,7 @@ function PlaceRow({ place }: { place: ApiPlace }) {
           </div>
         )}
       </div>
-    </article>
+    </Link>
   );
 }
 

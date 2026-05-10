@@ -252,6 +252,23 @@ body {
 }
 
 /* ============================================================
+   Depth utilities
+   ============================================================ */
+
+.cinematic-shadow {
+  box-shadow: 0 10px 40px rgba(105, 0, 18, 0.08);
+}
+.dark .cinematic-shadow {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.card-border {
+  border: 1px solid rgba(142, 112, 111, 0.15);
+}
+.dark .card-border {
+  border: 1px solid rgba(253, 248, 248, 0.05);
+}
+
+/* ============================================================
    Theme switch — sun/moon animated toggle
    Ported from original CSS, scaled to 18px base for navbar fit,
    colors wired to MMDb palette CSS vars.

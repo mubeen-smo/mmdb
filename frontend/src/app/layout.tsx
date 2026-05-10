@@ -38,6 +38,7 @@ export default function RootLayout({
       className={`${hankenGrotesk.variable} ${inter.variable} h-full`}
     >
       <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         {/* Material Symbols — variable icon font */}
         <link
           rel="stylesheet"
