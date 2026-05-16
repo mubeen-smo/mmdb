@@ -39,9 +39,9 @@ export function MobileSearch() {
       <button
         onClick={() => setOverlayOpen(true)}
         aria-label="Search"
-        className="lg:hidden p-1 text-secondary hover:text-primary transition-colors"
+        className="icon-btn lg:hidden text-secondary hover:text-primary hover:bg-surface-variant"
       >
-        <span className="material-symbols-outlined text-[24px] select-none">search</span>
+        <span className="material-symbols-outlined text-[22px] select-none">search</span>
       </button>
 
       {overlayOpen && (

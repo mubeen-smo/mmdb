@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Hanken_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
@@ -29,17 +29,22 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://mmdb.vercel.app"),
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",   // enables safe-area-inset-* on notched phones
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="en"
-      className={`${hankenGrotesk.variable} ${inter.variable} h-full`}
+      className={`${hankenGrotesk.variable} ${inter.variable}`}
     >
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        {/* Material Symbols — variable icon font */}
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block"
@@ -63,7 +68,7 @@ export default function RootLayout({
           }
         `}</style>
       </head>
-      <body className="min-h-full flex flex-col bg-surface text-on-surface antialiased">
+      <body className="flex flex-col bg-surface text-on-surface antialiased">
         <Navbar />
         <main className="flex-1">
           <PageWrapper>{children}</PageWrapper>

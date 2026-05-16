@@ -101,18 +101,18 @@ export function PlaceSearch() {
   return (
     <>
       {/* Hero */}
-      <section className="pt-stack-lg pb-stack-md">
+      <section className="pt-stack-md md:pt-stack-lg pb-stack-sm md:pb-stack-md">
         <div className="max-w-3xl">
-          <h1 className="type-display-xl text-on-background mb-4">The Maven&apos;s Places</h1>
-          <p className="type-body-lg text-secondary max-w-2xl leading-relaxed">
+          <h1 className="type-display-xl text-on-background mb-2 md:mb-4">The Maven&apos;s Places</h1>
+          <p className="type-body-md md:type-body-lg text-secondary max-w-2xl leading-relaxed">
             Every place we have eaten at, ranked and reviewed.{" "}
-            {!loading && <span>{total} entries in the directory.</span>}
+            {!loading && <span>{total} entries.</span>}
           </p>
         </div>
       </section>
 
       {/* Search */}
-      <section className="mb-stack-lg">
+      <section className="mb-stack-md md:mb-stack-lg">
         <div className="relative max-w-xl">
           <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-secondary text-[24px] select-none pointer-events-none">
             search

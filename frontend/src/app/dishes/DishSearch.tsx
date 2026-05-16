@@ -10,7 +10,7 @@ function DishImage({ itemId, alt }: { itemId: number; alt: string }) {
   const [hidden, setHidden] = useState(false);
   if (hidden) return null;
   return (
-    <div className="relative w-36 md:w-44 shrink-0 self-stretch">
+    <div className="relative w-20 h-20 md:w-44 md:h-auto md:self-stretch shrink-0 rounded-xl md:rounded-none overflow-hidden">
       <Image
         src={dishImageUrl(itemId)}
         alt={alt}

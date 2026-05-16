@@ -28,7 +28,7 @@ export function ThemeToggle() {
     <button
       onClick={toggle}
       aria-label="Toggle theme"
-      className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors text-on-surface-variant hover:text-on-surface"
+      className="icon-btn text-on-surface-variant hover:text-on-surface hover:bg-surface-variant"
     >
       <span className="material-symbols-outlined text-[22px] select-none">
         {dark ? "bedtime" : "light_mode"}

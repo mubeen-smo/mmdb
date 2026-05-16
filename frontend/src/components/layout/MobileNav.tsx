@@ -20,10 +20,14 @@ export function MobileNav() {
 
   const overlay = (
     <div
-      className={`fixed inset-0 z-40 flex flex-col justify-center px-12 transition-all duration-500 lg:hidden ${
+      className={`fixed inset-0 z-40 flex flex-col justify-start pt-20 px-8 sm:px-12 transition-all duration-500 lg:hidden ${
         open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
-      style={{ background: "rgba(251, 249, 248, 0.95)", backdropFilter: "blur(20px)" }}
+      style={{
+        backgroundColor: "rgb(var(--_surface) / 0.97)",
+        backdropFilter: "blur(24px)",
+        WebkitBackdropFilter: "blur(24px)",
+      }}
     >
       <div className="flex flex-col gap-8">
 
