@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     database_url: str
     allowed_origins: str = "http://localhost:3000"
 
-    model_config = {"env_file": ".env"}
+    model_config = {"env_file": ".env", "extra": "ignore"}
 
     @property
     def origins_list(self) -> list[str]:

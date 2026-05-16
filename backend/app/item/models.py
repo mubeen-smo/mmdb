@@ -1,6 +1,7 @@
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import BigInteger, Float, ForeignKey, Text
+from sqlalchemy import ARRAY, BigInteger, Boolean, Float, ForeignKey, Numeric, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -9,7 +10,7 @@ if TYPE_CHECKING:
     from app.place.models import Place
 
 
-class Dish(Base):
+class Item(Base):
     __tablename__ = "items_table"
 
     item_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
@@ -20,4 +21,10 @@ class Dish(Base):
     description: Mapped[str | None] = mapped_column(Text)
     tags: Mapped[str | None] = mapped_column(Text)
 
-    place: Mapped["Place"] = relationship(back_populates="dishes")
+    diet: Mapped[str | None] = mapped_column(Text)
+    course: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
+    meal_time: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
+    price: Mapped[Decimal | None] = mapped_column(Numeric(8, 2))
+    signature: Mapped[bool | None] = mapped_column(Boolean, default=False)
+
+    place: Mapped["Place"] = relationship(back_populates="items")
