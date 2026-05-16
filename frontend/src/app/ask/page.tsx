@@ -3,42 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
-// ── Config ────────────────────────────────────────────────────────────────────
+import { GREETING_TEXT, SUGGESTED_PROMPTS, randomVerb } from "@/lib/constants";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-
-const SUGGESTED_PROMPTS = [
-  "Best biryani in Hyderabad?",
-  "Veg-friendly cafes in Banjara Hills",
-  "Late-night food near Gachibowli",
-  "Signature dishes worth trying",
-];
-
-// Rotating verb shown while the agent is working
-const LOADING_VERBS = [
-  "Tasting…",
-  "Simmering…",
-  "Plating…",
-  "Foraging…",
-  "Seasoning…",
-  "Scouting…",
-  "Savoring…",
-  "Marinating…",
-  "Curating…",
-  "Sifting…",
-];
-
-const GREETING_TEXT =
-  "Hello. I know Hyderabad's food scene well — from old-city biryanis to hidden breakfast spots and late-night dhabas. Tell me what you're looking for.";
-
-// ── Types ─────────────────────────────────────────────────────────────────────
 
 type Message = {
   role: "user" | "assistant";
   content: string;
 };
-
-// ── Component ─────────────────────────────────────────────────────────────────
 
 export default function AskPage() {
   const [messages, setMessages] = useState<Message[]>([
@@ -46,13 +18,20 @@ export default function AskPage() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  // Pick a new verb each time loading starts
-  const [loadingVerb, setLoadingVerb] = useState(LOADING_VERBS[0]);
+  const [loadingVerb, setLoadingVerb] = useState(() => randomVerb());
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Scroll to bottom whenever messages change or loading state changes
+  useEffect(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => {},
+    );
+  }, []);
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
@@ -61,8 +40,7 @@ export default function AskPage() {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
 
-    // Pick a random loading verb for this request
-    setLoadingVerb(LOADING_VERBS[Math.floor(Math.random() * LOADING_VERBS.length)]);
+    setLoadingVerb(randomVerb());
 
     const userMsg: Message = { role: "user", content: trimmed };
     const history = [...messages, userMsg];
@@ -76,6 +54,8 @@ export default function AskPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: history.map((m) => ({ role: m.role, content: m.content })),
+          lat: location?.lat ?? null,
+          lng: location?.lng ?? null,
         }),
       });
 
@@ -85,10 +65,7 @@ export default function AskPage() {
     } catch {
       setMessages([
         ...history,
-        {
-          role: "assistant",
-          content: "Something went wrong. Make sure the backend is running.",
-        },
+        { role: "assistant", content: "Something went wrong. Make sure the backend is running." },
       ]);
     } finally {
       setLoading(false);
@@ -107,10 +84,8 @@ export default function AskPage() {
     <div className="flex flex-col h-[calc(100vh-80px)] max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-md">
       <div className="flex gap-gutter h-full overflow-hidden">
 
-        {/* ── Chat panel ───────────────────────────────────────────────── */}
         <section className="flex-grow flex flex-col bg-surface-container-low/70 backdrop-blur-sm rounded-xl border border-outline-variant/30 overflow-hidden max-w-3xl">
 
-          {/* Header */}
           <div className="px-6 py-4 border-b border-surface-container-highest flex items-center gap-3 bg-surface-container-low/50 shrink-0">
             <div className="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center shrink-0">
               <span
@@ -126,12 +101,9 @@ export default function AskPage() {
             </div>
           </div>
 
-          {/* Messages */}
           <div className="flex-grow overflow-y-auto px-6 py-5 flex flex-col gap-5">
-
             {messages.map((msg, i) =>
               msg.role === "assistant" ? (
-                // ── Assistant bubble ──────────────────────────────────────
                 <div key={i} className="flex gap-3 max-w-[88%]">
                   <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary-container flex items-center justify-center mt-0.5">
                     <span
@@ -142,7 +114,6 @@ export default function AskPage() {
                     </span>
                   </div>
                   <div className="bg-surface-container rounded-2xl rounded-tl-sm px-4 py-3">
-                    {/* react-markdown renders **bold**, bullet lists, etc. */}
                     <ReactMarkdown
                       components={{
                         p: ({ children }) => (
@@ -173,7 +144,6 @@ export default function AskPage() {
                   </div>
                 </div>
               ) : (
-                // ── User bubble ───────────────────────────────────────────
                 <div key={i} className="flex gap-3 max-w-[88%] self-end flex-row-reverse">
                   <div className="flex-shrink-0 w-7 h-7 rounded-full bg-secondary-container flex items-center justify-center mt-0.5">
                     <span
@@ -190,7 +160,6 @@ export default function AskPage() {
               )
             )}
 
-            {/* Loading indicator with rotating food verb */}
             {loading && (
               <div className="flex gap-3 max-w-[88%]">
                 <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary-container flex items-center justify-center mt-0.5">
@@ -201,7 +170,7 @@ export default function AskPage() {
                     auto_awesome
                   </span>
                 </div>
-                <div className="bg-surface-container rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-2">
+                <div className="bg-surface-container rounded-2xl rounded-tl-sm px-4 py-3">
                   <span className="type-body-md text-secondary animate-pulse">
                     {loadingVerb}
                   </span>
@@ -209,7 +178,6 @@ export default function AskPage() {
               </div>
             )}
 
-            {/* Suggested prompts — only shown before first user message */}
             {messages.length === 1 && !loading && (
               <div className="mt-1">
                 <p className="type-label-sm text-secondary/70 mb-3 uppercase tracking-widest text-xs">
@@ -232,7 +200,6 @@ export default function AskPage() {
             <div ref={bottomRef} />
           </div>
 
-          {/* Input bar */}
           <div className="px-6 py-4 border-t border-surface-container-highest shrink-0">
             <div className="flex items-center gap-3 bg-surface-container rounded-full px-5 py-2.5 border border-outline-variant/40 focus-within:border-primary/50 transition-colors">
               <input
@@ -264,10 +231,8 @@ export default function AskPage() {
           </div>
         </section>
 
-        {/* ── Desktop side panel ───────────────────────────────────────── */}
         <aside className="hidden lg:flex flex-col w-[320px] gap-4 shrink-0">
           <h2 className="type-title-md">Maven Selections</h2>
-
           <div className="flex-grow flex flex-col items-center justify-center bg-surface-container-low/50 rounded-xl border border-outline-variant/20 border-dashed p-8 text-center">
             <span
               className="material-symbols-outlined text-outline/50 mb-4 select-none"
