@@ -98,8 +98,11 @@ function DishCard({ dish }: { dish: ApiDish }) {
   );
 }
 
+type DietFilter = "all" | "veg" | "non_veg";
+
 export function DishSearch() {
   const [query, setQuery] = useState("");
+  const [dietFilter, setDietFilter] = useState<DietFilter>("all");
   const [dishes, setDishes] = useState<ApiDish[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -107,16 +110,21 @@ export function DishSearch() {
   useEffect(() => {
     let alive = true;
     setLoading(true);
+    const params = {
+      limit: 50,
+      ...(query ? { q: query } : {}),
+      ...(dietFilter !== "all" ? { dietFilter } : {}),
+    };
     const timer = setTimeout(async () => {
       try {
-        const { items, total } = await getDishes(query ? { q: query, limit: 50 } : { limit: 50 });
+        const { items, total } = await getDishes(params);
         if (alive) { setDishes(items); setTotal(total); }
       } finally {
         if (alive) setLoading(false);
       }
     }, query ? 300 : 0);
     return () => { alive = false; clearTimeout(timer); };
-  }, [query]);
+  }, [query, dietFilter]);
 
   return (
     <>
@@ -140,22 +148,25 @@ export function DishSearch() {
 
         <div className="flex flex-wrap items-center gap-3">
           <span className="type-label-sm text-secondary uppercase tracking-wider mr-2">Filters:</span>
-          {["All", "Veg", "Non-veg"].map((f, i) => (
+          {(
+            [
+              { label: "All", value: "all" },
+              { label: "Veg", value: "veg" },
+              { label: "Non-veg", value: "non_veg" },
+            ] as { label: string; value: DietFilter }[]
+          ).map(({ label, value }) => (
             <button
-              key={f}
-              className={`px-4 py-2 rounded-full type-label-sm ${
-                i === 0
+              key={value}
+              onClick={() => setDietFilter(value)}
+              className={`px-4 py-2 rounded-full type-label-sm transition-colors ${
+                dietFilter === value
                   ? "bg-primary text-on-primary"
                   : "bg-surface-container-high text-on-surface-variant hover:bg-surface-variant"
               }`}
             >
-              {f}
+              {label}
             </button>
           ))}
-          <div className="h-6 w-px bg-outline-variant mx-2" />
-          <span className="type-label-sm text-secondary">
-            {loading ? "…" : `${total} dishes`}
-          </span>
         </div>
       </section>
 

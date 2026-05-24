@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getDishes } from "@/lib/api";
+import { getDishes, getBlog } from "@/lib/api";
 
 import type { ApiDish } from "@/types";
 
@@ -74,7 +74,15 @@ function DishCard({ dish }: { dish: ApiDish }) {
 }
 
 export default async function LandingPage() {
-  const { items: trendingDishes } = await getDishes({ limit: 3 });
+  const [{ items: trendingDishes }, featuredBlog] = await Promise.all([
+    getDishes({ limit: 3 }),
+    getBlog("hyderabad-to-vijayawada-food-road-trip").catch(() => null),
+  ]);
+
+  const heroImage = featuredBlog
+    ? "https://ltgcwqhuyzyvfphawlin.supabase.co/storage/v1/object/public/media/blogs/1.jpg"
+    : "https://lh3.googleusercontent.com/aida-public/AB6AXuB09kl4TS7hevPeMWCf3nqt_H3nmnGWSrYzjCUWYocI27K73Jphv2LTz5H9OBuvMzbNa5hqEHiPtmtTsIDIOQMj1IoPP1_ginuP-J-5HHujFOWmZ0GgYKiLpdrsAuZ3WpD-JWHcabS4X2ujJC-IQ8270MmCiEFtDGdIuXBXSBTAnNFTfUEQhbDnFRHQnDDCraqV-AWIk5TzHzsY9OIEGyq8jnniRvzYiOo3OkZM2KvsK18yWNga8Nws_Con5J8hfS-McT2upl37R6s";
+  const heroAlt = featuredBlog ? featuredBlog.title : "Seared sea bass on pea purée with edible flowers";
 
   return (
     <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop space-y-stack-lg py-12">
@@ -84,15 +92,15 @@ export default async function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/90 via-transparent to-transparent z-10" />
         <div className="absolute inset-0 bg-gradient-to-r from-surface-container-lowest/40 via-transparent to-transparent z-10" />
         <Image
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuB09kl4TS7hevPeMWCf3nqt_H3nmnGWSrYzjCUWYocI27K73Jphv2LTz5H9OBuvMzbNa5hqEHiPtmtTsIDIOQMj1IoPP1_ginuP-J-5HHujFOWmZ0GgYKiLpdrsAuZ3WpD-JWHcabS4X2ujJC-IQ8270MmCiEFtDGdIuXBXSBTAnNFTfUEQhbDnFRHQnDDCraqV-AWIk5TzHzsY9OIEGyq8jnniRvzYiOo3OkZM2KvsK18yWNga8Nws_Con5J8hfS-McT2upl37R6s"
-          alt="Seared sea bass on pea purée with edible flowers"
+          src={heroImage}
+          alt={heroAlt}
           fill
           className="object-cover transform group-hover:scale-105 transition-transform duration-1000"
           priority
         />
         <div className="absolute bottom-0 left-0 p-8 md:p-12 z-20 max-w-2xl space-y-6">
           <span className="inline-block bg-primary text-on-primary text-[11px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest">
-            Editor&apos;s Choice
+            {featuredBlog ? "Featured Guide" : "Editor’s Choice"}
           </span>
           <h1
             className="text-on-surface leading-tight"
@@ -103,17 +111,16 @@ export default async function LandingPage() {
               letterSpacing: "-0.03em",
             }}
           >
-            The Art of the Modern Omakase
+            {featuredBlog ? featuredBlog.title : "The Art of the Modern Omakase"}
           </h1>
           <p className="type-body-lg text-on-surface-variant opacity-90 max-w-lg">
-            Discover the hidden temples of Kyoto where tradition meets
-            avant-garde technique in a symphony of seasonal purity.
+            {featuredBlog?.subtitle ?? "Discover the hidden temples of Kyoto where tradition meets avant-garde technique in a symphony of seasonal purity."}
           </p>
           <Link
-            href="/guides"
+            href={featuredBlog ? `/guides/${featuredBlog.slug}` : "/guides"}
             className="inline-block bg-primary hover:bg-primary/90 text-on-primary font-bold px-10 py-4 rounded-xl transition-all active:scale-95 shadow-xl shadow-primary/20"
           >
-            Read the Treatise
+            {featuredBlog ? "Read Guide" : "Read the Treatise"}
           </Link>
         </div>
       </section>

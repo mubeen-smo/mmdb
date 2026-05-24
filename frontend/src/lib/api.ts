@@ -1,4 +1,4 @@
-import type { ApiDish, ApiDishList, ApiPlace, ApiPlaceDetail, ApiPlaceList } from "@/types";
+import type { ApiDish, ApiDishList, ApiPlace, ApiPlaceDetail, ApiPlaceList, Article, ArticleDetail } from "@/types";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -41,6 +41,7 @@ export async function getDishes(params?: {
   q?: string;
   tags?: string;
   place_id?: number;
+  dietFilter?: "veg" | "non_veg";
   limit?: number;
   offset?: number;
 }): Promise<ApiDishList> {
@@ -51,6 +52,8 @@ export async function getDishes(params?: {
   }
   if (params?.tags) qs.set("tags", `eq.${params.tags}`);
   if (params?.place_id != null) qs.set("place_id", `eq.${params.place_id}`);
+  if (params?.dietFilter === "veg") qs.set("diet", "in.(veg,vegan)");
+  if (params?.dietFilter === "non_veg") qs.set("diet", "in.(non_veg,egg)");
   qs.set("order", "item_rating.desc.nullslast,item.asc");
   qs.set("limit", String(params?.limit ?? 50));
   qs.set("offset", String(params?.offset ?? 0));
@@ -84,6 +87,36 @@ export async function getPlaces(params?: {
 
   const { data, total } = await pgFetch<ApiPlace>("places_table", qs, true);
   return { total, items: data };
+}
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+export async function getBlogs(params?: {
+  theme?: string;
+  tag?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<Article[]> {
+  const qs = new URLSearchParams();
+  if (params?.theme) qs.set("theme", params.theme);
+  if (params?.tag) qs.set("tag", params.tag);
+  if (params?.limit != null) qs.set("limit", String(params.limit));
+  if (params?.offset != null) qs.set("offset", String(params.offset));
+
+  const res = await fetch(`${API_URL}/api/blogs?${qs}`, {
+    next: { revalidate: 60 },
+  });
+  if (!res.ok) throw new Error(`Blog API ${res.status}`);
+  return res.json() as Promise<Article[]>;
+}
+
+export async function getBlog(slug: string): Promise<ArticleDetail | null> {
+  const res = await fetch(`${API_URL}/api/blogs/${slug}`, {
+    next: { revalidate: 60 },
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`Blog API ${res.status}`);
+  return res.json() as Promise<ArticleDetail>;
 }
 
 export async function getPlace(placeId: number): Promise<ApiPlaceDetail> {

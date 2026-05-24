@@ -7,6 +7,7 @@ export interface ApiDish {
   item_rating: number | null;
   description: string | null;
   tags: string | null;
+  diet: string | null;
 }
 
 export interface ApiPlace {
@@ -36,15 +37,26 @@ export interface ApiPlaceList {
   items: ApiPlace[];
 }
 
+// Hero images are derived from blog_id — never stored as a URL.
+// Pattern: https://ltgcwqhuyzyvfphawlin.supabase.co/storage/v1/object/public/media/blogs/{blog_id}.jpg
+export const SUPABASE_BASE_URL = "https://ltgcwqhuyzyvfphawlin.supabase.co";
+export function blogHeroUrl(blog_id: number): string {
+  return `${SUPABASE_BASE_URL}/storage/v1/object/public/media/blogs/${blog_id}.jpg`;
+}
+
 export interface Article {
-  id: string;
+  blog_id: number;
   slug: string;
   title: string;
-  excerpt: string;
-  badge: string;
-  badgeVariant: "primary" | "secondary" | "tertiary";
-  mavenScore: number;
-  readTimeMinutes: number;
-  topic: string;
-  image: string;
+  subtitle: string | null;
+  hero_image?: string | null;
+  author: string | null;
+  theme: string | null;
+  tags: string[] | null;
+  status: string | null;
+  published_at: string | null;
+}
+
+export interface ArticleDetail extends Article {
+  body_md: string;
 }

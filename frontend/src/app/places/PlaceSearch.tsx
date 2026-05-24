@@ -105,8 +105,7 @@ export function PlaceSearch() {
         <div className="max-w-3xl">
           <h1 className="type-display-xl text-on-background mb-2 md:mb-4">The Maven&apos;s Places</h1>
           <p className="type-body-md md:type-body-lg text-secondary max-w-2xl leading-relaxed">
-            Every place we have eaten at, ranked and reviewed.{" "}
-            {!loading && <span>{total} entries.</span>}
+            Every place we have eaten at, ranked and reviewed.
           </p>
         </div>
       </section>
