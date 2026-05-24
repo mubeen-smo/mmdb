@@ -13,7 +13,6 @@ class Blog(Base):
     title: Mapped[str] = mapped_column(Text, nullable=False)
     subtitle: Mapped[str | None] = mapped_column(Text)
     body_md: Mapped[str] = mapped_column(Text, nullable=False)
-    hero_image: Mapped[str | None] = mapped_column(Text)
     author: Mapped[str | None] = mapped_column(Text, default="maven")
     theme: Mapped[str | None] = mapped_column(Text)
     tags: Mapped[list[str] | None] = mapped_column(ARRAY(Text))
