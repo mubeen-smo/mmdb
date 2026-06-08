@@ -70,7 +70,7 @@ export function NavSearch() {
               {dishes.map((dish) => (
                 <button
                   key={dish.item_id}
-                  onClick={() => navigate(`/dishes`)}
+                  onClick={() => navigate(`/dishes?q=${encodeURIComponent(query)}`)}
                   className="w-full text-left px-4 py-3 hover:bg-surface-container-low transition-colors border-b border-outline-variant/10 last:border-0 flex justify-between items-start gap-3"
                 >
                   <div>
@@ -115,8 +115,4 @@ export function NavSearch() {
             </div>
           )}
 
-        </div>
-      )}
-    </div>
-  );
-}
+        </d

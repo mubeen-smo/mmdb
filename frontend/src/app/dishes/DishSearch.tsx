@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { getDishes, dishImageUrl } from "@/lib/api";
@@ -101,7 +102,8 @@ function DishCard({ dish }: { dish: ApiDish }) {
 type DietFilter = "all" | "veg" | "non_veg";
 
 export function DishSearch() {
-  const [query, setQuery] = useState("");
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [dietFilter, setDietFilter] = useState<DietFilter>("all");
   const [dishes, setDishes] = useState<ApiDish[]>([]);
   const [total, setTotal] = useState(0);
@@ -183,11 +185,4 @@ export function DishSearch() {
         </p>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {dishes.map((dish) => (
-            <DishCard key={dish.item_id} dish={dish} />
-          ))}
-        </div>
-      )}
-    </>
-  );
-}
+          {dishes.m
