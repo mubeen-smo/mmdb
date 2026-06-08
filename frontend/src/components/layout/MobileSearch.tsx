@@ -8,7 +8,7 @@ import type { ApiDish, ApiPlace } from "@/types";
 
 export function MobileSearch() {
   const [overlayOpen, setOverlayOpen] = useState(false);
-  const [visible, setVisible] = useState(false);   // drives CSS transition
+  const [visible, setVisible] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [query, setQuery] = useState("");
   const [dishes, setDishes] = useState<ApiDish[]>([]);
@@ -19,21 +19,15 @@ export function MobileSearch() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Open: mount first, then trigger transition on next frame
   useEffect(() => {
     if (overlayOpen) {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setVisible(true));
-      });
-      setTimeout(() => inputRef.current?.focus(), 80);
+      requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
+      setTimeout(() => inputRef.current?.focus(), 100);
+      document.body.style.overflow = "hidden";
     } else {
       setVisible(false);
+      document.body.style.overflow = "";
     }
-  }, [overlayOpen]);
-
-  // Lock body scroll while open
-  useEffect(() => {
-    document.body.style.overflow = overlayOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [overlayOpen]);
 
@@ -43,7 +37,7 @@ export function MobileSearch() {
     const t = setTimeout(async () => {
       try {
         const [d, p] = await Promise.all([
-          getDishes({ q: query, limit: 5 }),
+          getDishes({ q: query, limit: 6 }),
           getPlaces({ q: query, limit: 4 }),
         ]);
         setDishes(d.items);
@@ -55,8 +49,6 @@ export function MobileSearch() {
     return () => clearTimeout(t);
   }, [query]);
 
-  function open() { setOverlayOpen(true); }
-
   function close() {
     setVisible(false);
     setTimeout(() => {
@@ -64,7 +56,7 @@ export function MobileSearch() {
       setQuery("");
       setDishes([]);
       setPlaces([]);
-    }, 220);
+    }, 200);
   }
 
   function navigate(href: string) {
@@ -72,47 +64,34 @@ export function MobileSearch() {
     router.push(href);
   }
 
+  const hasResults = dishes.length > 0 || places.length > 0;
+
   const overlay = mounted ? createPortal(
     <div
-      aria-hidden={!overlayOpen}
-      className="fixed inset-0 z-[9999] lg:hidden flex flex-col"
-      style={{
-        pointerEvents: overlayOpen ? "auto" : "none",
-      }}
+      style={{ pointerEvents: overlayOpen ? "auto" : "none" }}
+      className="fixed inset-0 z-[9999] lg:hidden"
     >
-      {/* Backdrop — semi-transparent, not full white */}
+      {/* Full opaque background — fades in */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 bg-surface"
         style={{
-          background: "var(--color-surface)",
-          opacity: visible ? 0.97 : 0,
-          transition: "opacity 220ms cubic-bezier(0.4,0,0.2,1)",
+          opacity: visible ? 1 : 0,
+          transition: "opacity 200ms ease",
         }}
       />
 
-      {/* Page peek — bottom 15% fades to transparent so site bleeds through */}
+      {/* Content — slides up slightly as it fades in */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-[18%] pointer-events-none"
+        className="relative flex flex-col h-full"
         style={{
-          background: "linear-gradient(to bottom, transparent, var(--color-surface))",
           opacity: visible ? 1 : 0,
-          transition: "opacity 220ms cubic-bezier(0.4,0,0.2,1)",
-        }}
-      />
-
-      {/* Content panel — slides down from top */}
-      <div
-        className="relative flex flex-col"
-        style={{
-          maxHeight: "85vh",
-          transform: visible ? "translateY(0)" : "translateY(-12px)",
-          opacity: visible ? 1 : 0,
-          transition: "transform 220ms cubic-bezier(0.4,0,0.2,1), opacity 200ms cubic-bezier(0.4,0,0.2,1)",
+          transform: visible ? "translateY(0)" : "translateY(10px)",
+          transition: "opacity 200ms ease, transform 200ms ease",
         }}
       >
-        {/* Search bar — mirrors navbar height */}
-        <div className="flex items-center gap-3 px-4 h-14 border-b border-outline-variant/20 shrink-0 bg-surface/95 backdrop-blur-sm">
-          <span className="material-symbols-outlined text-secondary text-[22px] shrink-0 select-none">
+        {/* Search bar */}
+        <div className="flex items-center gap-3 px-4 h-14 border-b border-outline-variant/20 bg-surface shrink-0">
+          <span className="material-symbols-outlined text-secondary text-[20px] shrink-0 select-none">
             search
           </span>
           <input
@@ -120,65 +99,89 @@ export function MobileSearch() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search dishes, places…"
-            className="flex-1 bg-transparent type-body-md text-on-surface placeholder:text-secondary/50 outline-none"
+            placeholder="Dishes, places, areas…"
+            className="flex-1 bg-transparent type-body-md text-on-surface placeholder:text-secondary/40 outline-none"
           />
-          <button
-            onClick={close}
-            aria-label="Close search"
-            className="shrink-0 w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-secondary hover:text-on-surface"
-          >
-            <span className="material-symbols-outlined text-[22px] select-none">close</span>
-          </button>
+          {query ? (
+            <button
+              onClick={() => { setQuery(""); setDishes([]); setPlaces([]); }}
+              className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high text-secondary"
+            >
+              <span className="material-symbols-outlined text-[18px] select-none">close</span>
+            </button>
+          ) : (
+            <button
+              onClick={close}
+              className="shrink-0 text-secondary type-label-sm font-medium tracking-wide"
+            >
+              Cancel
+            </button>
+          )}
         </div>
 
-        {/* Results */}
-        <div className="overflow-y-auto" style={{ maxHeight: "calc(85vh - 56px)" }}>
+        {/* Results area */}
+        <div className="flex-1 overflow-y-auto">
 
-          {/* Loading skeletons */}
+          {/* Empty — no query */}
+          {!query.trim() && (
+            <div className="flex flex-col items-center justify-center h-64 gap-2">
+              <span
+                className="material-symbols-outlined text-outline/30 select-none"
+                style={{ fontSize: 48 }}
+              >
+                search
+              </span>
+              <p className="type-body-md text-secondary/40">Search dishes, places, areas</p>
+            </div>
+          )}
+
+          {/* Loading */}
           {loading && (
-            <div className="px-4 pt-5 space-y-3">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex gap-3 items-center animate-pulse">
+            <div className="px-4 pt-6 space-y-4">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex items-center gap-3 animate-pulse">
+                  <div className="w-9 h-9 rounded-xl bg-surface-container-high shrink-0" />
                   <div className="flex-1 space-y-1.5">
-                    <div className="h-4 bg-surface-container-high rounded w-2/3" />
-                    <div className="h-3 bg-surface-container-high rounded w-1/3 opacity-60" />
+                    <div className="h-3.5 bg-surface-container-high rounded-full w-1/2" />
+                    <div className="h-3 bg-surface-container-high rounded-full w-1/3 opacity-60" />
                   </div>
-                  <div className="h-4 w-6 bg-surface-container-high rounded opacity-40" />
                 </div>
               ))}
             </div>
           )}
 
-          {!loading && !query.trim() && (
-            <p className="text-center py-14 type-body-md text-secondary/40">
-              Start typing to search
-            </p>
+          {/* No results */}
+          {!loading && query.trim() && !hasResults && (
+            <div className="flex flex-col items-center justify-center h-64 gap-2">
+              <p className="type-body-md text-on-surface">No results for &ldquo;{query}&rdquo;</p>
+              <p className="type-body-sm text-secondary/50">Try a dish name, place, or area</p>
+            </div>
           )}
 
-          {!loading && query.trim() && dishes.length === 0 && places.length === 0 && (
-            <p className="text-center py-14 type-body-md text-secondary">
-              No results for &ldquo;{query}&rdquo;
-            </p>
-          )}
-
+          {/* Dishes */}
           {!loading && dishes.length > 0 && (
-            <>
-              <div className="px-4 pt-5 pb-2">
-                <span className="type-label-sm text-[10px] text-secondary uppercase tracking-widest">
-                  Dishes
-                </span>
-              </div>
+            <div className="pt-4">
+              <p className="px-4 pb-2 type-label-sm text-[10px] text-secondary uppercase tracking-widest">
+                Dishes
+              </p>
               {dishes.map((dish) => (
                 <button
                   key={dish.item_id}
                   onClick={() => navigate(`/dishes?q=${encodeURIComponent(query)}`)}
-                  className="w-full text-left px-4 py-3.5 border-b border-outline-variant/10 active:bg-surface-container-low transition-colors flex justify-between items-center gap-3"
+                  className="w-full flex items-center gap-3 px-4 py-3 active:bg-surface-container-low transition-colors"
                 >
-                  <div>
-                    <div className="type-body-md text-on-surface font-medium">{dish.item}</div>
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <span
+                      className="material-symbols-outlined text-primary select-none"
+                      style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}
+                    >
+                      restaurant
+                    </span>
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="type-body-md text-on-surface font-medium truncate">{dish.item}</div>
                     {dish.place_name && (
-                      <div className="type-body-sm text-secondary mt-0.5">{dish.place_name}</div>
+                      <div className="type-body-sm text-secondary truncate">{dish.place_name}</div>
                     )}
                   </div>
                   {dish.item_rating != null && (
@@ -188,29 +191,38 @@ export function MobileSearch() {
                   )}
                 </button>
               ))}
-            </>
+            </div>
           )}
 
+          {/* Places */}
           {!loading && places.length > 0 && (
-            <>
-              <div className="px-4 pt-5 pb-2">
-                <span className="type-label-sm text-[10px] text-secondary uppercase tracking-widest">
-                  Places
-                </span>
-              </div>
+            <div className="pt-4 pb-8">
+              <p className="px-4 pb-2 type-label-sm text-[10px] text-secondary uppercase tracking-widest">
+                Places
+              </p>
               {places.map((place) => (
                 <button
                   key={place.place_id}
                   onClick={() => navigate(`/places/${place.place_id}`)}
-                  className="w-full text-left px-4 py-3.5 border-b border-outline-variant/10 active:bg-surface-container-low transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 active:bg-surface-container-low transition-colors"
                 >
-                  <div className="type-body-md text-on-surface font-medium">{place.place_name}</div>
-                  {place.location && (
-                    <div className="type-body-sm text-secondary mt-0.5">{place.location}</div>
-                  )}
+                  <div className="w-9 h-9 rounded-xl bg-surface-container-high flex items-center justify-center shrink-0">
+                    <span
+                      className="material-symbols-outlined text-secondary select-none"
+                      style={{ fontSize: 18 }}
+                    >
+                      location_on
+                    </span>
+                  </div>
+                  <div className="flex-1 text-left min-w-0">
+                    <div className="type-body-md text-on-surface font-medium truncate">{place.place_name}</div>
+                    {place.location && (
+                      <div className="type-body-sm text-secondary truncate">{place.location}</div>
+                    )}
+                  </div>
                 </button>
               ))}
-            </>
+            </div>
           )}
 
         </div>
@@ -222,7 +234,7 @@ export function MobileSearch() {
   return (
     <>
       <button
-        onClick={open}
+        onClick={() => setOverlayOpen(true)}
         aria-label="Search"
         className="icon-btn lg:hidden text-secondary hover:text-primary hover:bg-surface-variant"
       >
