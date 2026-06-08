@@ -38,8 +38,8 @@ export interface ApiPlaceList {
 }
 
 // Hero images are derived from blog_id — never stored as a URL.
-// Pattern: https://ltgcwqhuyzyvfphawlin.supabase.co/storage/v1/object/public/media/blogs/{blog_id}.jpg
-export const SUPABASE_BASE_URL = "https://ltgcwqhuyzyvfphawlin.supabase.co";
+// Pattern: {NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/blogs/{blog_id}.jpg
+export const SUPABASE_BASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 export function blogHeroUrl(blog_id: number): string {
   return `${SUPABASE_BASE_URL}/storage/v1/object/public/media/blogs/${blog_id}.jpg`;
 }

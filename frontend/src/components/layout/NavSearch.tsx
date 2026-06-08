@@ -115,4 +115,8 @@ export function NavSearch() {
             </div>
           )}
 
-        </d
+        </div>
+      )}
+    </div>
+  );
+}

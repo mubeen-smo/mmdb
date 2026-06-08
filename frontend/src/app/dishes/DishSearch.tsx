@@ -185,4 +185,11 @@ export function DishSearch() {
         </p>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {dishes.m
+          {dishes.map((dish) => (
+            <DishCard key={dish.item_id} dish={dish} />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}

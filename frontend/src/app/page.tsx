@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getDishes, getBlog } from "@/lib/api";
 
 import type { ApiDish } from "@/types";
+import { blogHeroUrl } from "@/types";
 
 function DishCard({ dish }: { dish: ApiDish }) {
   return (
@@ -80,7 +81,7 @@ export default async function LandingPage() {
   ]);
 
   const heroImage = featuredBlog
-    ? "https://ltgcwqhuyzyvfphawlin.supabase.co/storage/v1/object/public/media/blogs/1.jpg"
+    ? blogHeroUrl(1)
     : "https://lh3.googleusercontent.com/aida-public/AB6AXuB09kl4TS7hevPeMWCf3nqt_H3nmnGWSrYzjCUWYocI27K73Jphv2LTz5H9OBuvMzbNa5hqEHiPtmtTsIDIOQMj1IoPP1_ginuP-J-5HHujFOWmZ0GgYKiLpdrsAuZ3WpD-JWHcabS4X2ujJC-IQ8270MmCiEFtDGdIuXBXSBTAnNFTfUEQhbDnFRHQnDDCraqV-AWIk5TzHzsY9OIEGyq8jnniRvzYiOo3OkZM2KvsK18yWNga8Nws_Con5J8hfS-McT2upl37R6s";
   const heroAlt = featuredBlog ? featuredBlog.title : "Seared sea bass on pea purée with edible flowers";
 

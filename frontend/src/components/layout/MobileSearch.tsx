@@ -135,4 +135,28 @@ export function MobileSearch() {
               >
                 <div className="type-body-md text-on-surface font-medium">{place.place_name}</div>
                 {place.location && (
-                  <div className="type-body-sm text-secondary 
+                  <div className="type-body-sm text-secondary mt-0.5">{place.location}</div>
+                )}
+              </button>
+            ))}
+          </>
+        )}
+      </div>
+    </div>,
+    document.body
+  ) : null;
+
+  return (
+    <>
+      <button
+        onClick={() => setOverlayOpen(true)}
+        aria-label="Search"
+        className="icon-btn lg:hidden text-secondary hover:text-primary hover:bg-surface-variant"
+      >
+        <span className="material-symbols-outlined text-[22px] select-none">search</span>
+      </button>
+
+      {overlay}
+    </>
+  );
+}
