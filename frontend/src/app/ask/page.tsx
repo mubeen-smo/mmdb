@@ -20,6 +20,7 @@ export default function AskPage() {
   const [loading, setLoading] = useState(false);
   const [loadingVerb, setLoadingVerb] = useState(() => randomVerb());
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -56,11 +57,13 @@ export default function AskPage() {
           messages: history.map((m) => ({ role: m.role, content: m.content })),
           lat: location?.lat ?? null,
           lng: location?.lng ?? null,
+          conversation_id: conversationId,
         }),
       });
 
       if (!res.ok) throw new Error(`${res.status}`);
       const data = await res.json();
+      if (data.conversation_id) setConversationId(data.conversation_id);
       setMessages([...history, { role: "assistant", content: data.reply }]);
     } catch {
       setMessages([

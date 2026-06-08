@@ -10,7 +10,9 @@ class ChatRequest(BaseModel):
     messages: list[Message]
     lat: float | None = None
     lng: float | None = None
+    conversation_id: str | None = None
 
 
 class ChatResponse(BaseModel):
     reply: str
+    conversation_id: str | None = None
