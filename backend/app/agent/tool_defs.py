@@ -42,12 +42,6 @@ TOOL_DEFINITIONS: list[dict] = [
                         "type": "boolean",
                         "description": "Pass true to restrict to vegetarian-friendly places.",
                     },
-                    "limit": {
-                        "type": "integer",
-                        "description": "Maximum number of results to return (1–10). Default 5.",
-                        "minimum": 1,
-                        "maximum": 10,
-                    },
                 },
                 "required": [],
             },
@@ -100,12 +94,6 @@ TOOL_DEFINITIONS: list[dict] = [
                             "Restrict results to a specific place by its ID "
                             "(useful after a search_places call)."
                         ),
-                    },
-                    "limit": {
-                        "type": "integer",
-                        "description": "Maximum number of results to return (1–10). Default 8.",
-                        "minimum": 1,
-                        "maximum": 10,
                     },
                 },
                 "required": [],

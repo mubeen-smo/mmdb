@@ -154,6 +154,13 @@ async def run_pipeline(
                 args = json.loads(tc.function.arguments)
             except json.JSONDecodeError:
                 args = {}
+            # Groq/Llama sometimes serialises integers as strings; coerce known int fields.
+            for int_field in ("place_id", "limit"):
+                if int_field in args and isinstance(args[int_field], str):
+                    try:
+                        args[int_field] = int(args[int_field])
+                    except ValueError:
+                        args.pop(int_field)
             tool_result = await _dispatch_tool(
                 tc.function.name, args, db, user_lat, user_lng
             )
