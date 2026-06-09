@@ -151,7 +151,7 @@ async def run_pipeline(
         # Execute all tool calls and append all results before next LLM call
         for tc in assistant_msg.tool_calls:
             try:
-                args = json.loads(tc.function.arguments)
+                args = json.loads(tc.function.arguments) or {}
             except json.JSONDecodeError:
                 args = {}
             # Groq/Llama sometimes serialises integers as strings; coerce known int fields.
