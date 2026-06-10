@@ -2,21 +2,24 @@
 
 1. Hard asserts   — status, latency, non-empty, not the UI error string.
 2. Ground truth   — every bolded name must exist in the database.
-3. LLM judge      — Claude scores the transcript against the case rubric.
+3. LLM judge      — GPT-4o-mini scores the transcript against the case rubric.
 
-Layers 2 and 3 degrade gracefully: if DATABASE_URL / ANTHROPIC_API_KEY are
+Layers 2 and 3 degrade gracefully: if DATABASE_URL / OPENAI_API_KEY are
 absent they are skipped and noted, so the harness still produces a report.
+
+Using OpenAI as judge (different model family from the Groq/Llama agent under
+test) to avoid self-grading bias.
 """
 import json
 import os
 import re
 
-from anthropic import AsyncAnthropic
+from openai import AsyncOpenAI
 
 from db import load_known_names
 
 BOLD = re.compile(r"\*\*(.+?)\*\*")
-JUDGE_MODEL = "claude-sonnet-4-6"
+JUDGE_MODEL = "gpt-4o-mini"
 ERROR_REPLY = "Something went wrong"
 
 _known_names: set[str] | None = None
@@ -70,9 +73,9 @@ async def _grounding_check(result: dict) -> dict:
 
 
 async def _llm_judge(result: dict) -> dict:
-    if not os.environ.get("ANTHROPIC_API_KEY"):
+    if not os.environ.get("OPENAI_API_KEY"):
         return {"check": "llm_judge", "pass": None, "score": None,
-                "detail": "skipped (no ANTHROPIC_API_KEY)"}
+                "detail": "skipped (no OPENAI_API_KEY)"}
 
     transcript = "\n\n".join(
         f"USER: {t['prompt']}\nBOT: {t.get('reply') or '(no reply)'}"
@@ -85,14 +88,14 @@ async def _llm_judge(result: dict) -> dict:
         "Grade strictly. Reply with ONLY a JSON object: "
         '{\"pass\": true|false, \"score\": 1-5, \"reason\": \"one sentence\"}.'
     )
-    client = AsyncAnthropic()
-    msg = await client.messages.create(
+    client = AsyncOpenAI()
+    msg = await client.chat.completions.create(
         model=JUDGE_MODEL,
         max_tokens=300,
         messages=[{"role": "user", "content": prompt}],
+        response_format={"type": "json_object"},
     )
-    text = msg.content[0].text.strip()
-    text = re.sub(r"^```(?:json)?|```$", "", text, flags=re.MULTILINE).strip()
+    text = (msg.choices[0].message.content or "").strip()
     try:
         verdict = json.loads(text)
     except json.JSONDecodeError:
