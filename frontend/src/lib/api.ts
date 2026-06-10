@@ -89,34 +89,32 @@ export async function getPlaces(params?: {
   return { total, items: data };
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-
 export async function getBlogs(params?: {
   theme?: string;
   tag?: string;
   limit?: number;
   offset?: number;
 }): Promise<Article[]> {
-  const qs = new URLSearchParams();
-  if (params?.theme) qs.set("theme", params.theme);
-  if (params?.tag) qs.set("tag", params.tag);
-  if (params?.limit != null) qs.set("limit", String(params.limit));
-  if (params?.offset != null) qs.set("offset", String(params.offset));
+  const qs = new URLSearchParams({ select: "*", status: "eq.published" });
+  if (params?.theme) qs.set("theme", `eq.${params.theme}`);
+  if (params?.tag) qs.set("tags", `cs.{${params.tag}}`);
+  qs.set("order", "published_at.desc");
+  qs.set("limit", String(params?.limit ?? 20));
+  if (params?.offset) qs.set("offset", String(params.offset));
 
-  const res = await fetch(`${API_URL}/api/blogs?${qs}`, {
-    next: { revalidate: 60 },
-  });
-  if (!res.ok) throw new Error(`Blog API ${res.status}`);
-  return res.json() as Promise<Article[]>;
+  const { data } = await pgFetch<Article>("blogs", qs);
+  return data;
 }
 
 export async function getBlog(slug: string): Promise<ArticleDetail | null> {
-  const res = await fetch(`${API_URL}/api/blogs/${slug}`, {
-    next: { revalidate: 60 },
+  const qs = new URLSearchParams({
+    select: "*",
+    slug: `eq.${slug}`,
+    status: "eq.published",
+    limit: "1",
   });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`Blog API ${res.status}`);
-  return res.json() as Promise<ArticleDetail>;
+  const { data } = await pgFetch<ArticleDetail>("blogs", qs);
+  return data[0] ?? null;
 }
 
 export async function getPlace(placeId: number): Promise<ApiPlaceDetail> {
