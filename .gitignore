@@ -29,6 +29,9 @@ dist/
 *.egg-info/
 .pytest_cache/
 
+# ── Eval harness ─────────────────────────────────────────────
+eval/report.md
+
 # ── Logs ─────────────────────────────────────────────────────
 *.log
 npm-debug.log*
