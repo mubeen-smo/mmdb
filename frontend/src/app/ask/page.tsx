@@ -22,7 +22,7 @@ export default function AskPage() {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
 
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollBoxRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -34,7 +34,8 @@ export default function AskPage() {
   }, []);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = scrollBoxRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [messages, loading]);
 
   async function send(text: string) {
@@ -104,7 +105,7 @@ export default function AskPage() {
             </div>
           </div>
 
-          <div className="flex-grow overflow-y-auto px-6 py-5 flex flex-col gap-5">
+          <div ref={scrollBoxRef} className="flex-grow overflow-y-auto px-6 py-5 flex flex-col gap-5">
             {messages.map((msg, i) =>
               msg.role === "assistant" ? (
                 <div key={i} className="flex gap-3 max-w-[88%]">
@@ -200,7 +201,7 @@ export default function AskPage() {
               </div>
             )}
 
-            <div ref={bottomRef} />
+            <div />
           </div>
 
           <div className="px-6 py-4 border-t border-surface-container-highest shrink-0">
