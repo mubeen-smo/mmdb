@@ -1,8 +1,11 @@
 import json
+import logging
 import os
 
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, BadRequestError
 from sqlalchemy.ext.asyncio import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 from app.agent.memory import cleanup_old_conversations, load_conversation, save_conversation
 from app.agent.tool_defs import TOOL_DEFINITIONS
@@ -108,14 +111,27 @@ async def run_pipeline(
     for round_idx in range(MAX_ROUNDS):
         is_last_round = round_idx == MAX_ROUNDS - 1
 
-        response = await client.chat.completions.create(
-            model=MODEL,
-            messages=llm_messages,
-            tools=TOOL_DEFINITIONS,
-            tool_choice="none" if is_last_round else "auto",
-            max_tokens=1024,
-            temperature=0.4,
-        )
+        try:
+            response = await client.chat.completions.create(
+                model=MODEL,
+                messages=llm_messages,
+                tools=TOOL_DEFINITIONS,
+                tool_choice="none" if is_last_round else "auto",
+                max_tokens=1024,
+                temperature=0.4,
+            )
+        except BadRequestError as exc:
+            if "tool_use_failed" in str(exc):
+                logger.warning("Groq tool_use_failed — retrying without tools: %s", exc)
+                response = await client.chat.completions.create(
+                    model=MODEL,
+                    messages=llm_messages,
+                    tool_choice="none",
+                    max_tokens=1024,
+                    temperature=0.4,
+                )
+            else:
+                raise
 
         assistant_msg = response.choices[0].message
 
