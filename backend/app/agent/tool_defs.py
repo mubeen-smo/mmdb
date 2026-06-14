@@ -12,9 +12,7 @@ TOOL_DEFINITIONS: list[dict] = [
                 "food places in Hyderabad. Returns a ranked list of matching places "
                 "with ratings, cuisine tags, price tier, and veg-friendly status. "
                 "Use this when the user asks about where to eat, a type of cuisine, "
-                "a specific area, or a particular place. When the user mentions a specific "
-                "neighbourhood (e.g. 'near Madhapur'), set reference_area to rank results "
-                "by proximity to that area."
+                "a specific area, or a particular place."
             ),
             "parameters": {
                 "type": "object",
@@ -43,16 +41,6 @@ TOOL_DEFINITIONS: list[dict] = [
                     "veg_friendly": {
                         "type": "boolean",
                         "description": "Pass true to restrict to vegetarian-friendly places.",
-                    },
-                    "reference_area": {
-                        "type": "string",
-                        "description": (
-                            "An area or neighbourhood name mentioned in the user's query to use as a "
-                            "proximity reference — e.g. 'Madhapur', 'Banjara Hills', 'Jubilee Hills'. "
-                            "When set, results are ranked by distance to this area. "
-                            "Use when the user says 'near Madhapur', 'around Banjara Hills', etc. "
-                            "Do NOT set when the user says 'near me' — GPS coordinates handle that."
-                        ),
                     },
                 },
                 "required": [],
@@ -103,8 +91,9 @@ TOOL_DEFINITIONS: list[dict] = [
                     "place_id": {
                         "type": "integer",
                         "description": (
-                            "Restrict results to a specific place by its ID "
-                            "(useful after a search_places call)."
+                            "Restrict results to one or more places by ID. Pass a single ID or a list of IDs. "
+                            "For location-scoped dish queries, first call search_places to get ranked place IDs, "
+                            "then pass those IDs here."
                         ),
                     },
                 },

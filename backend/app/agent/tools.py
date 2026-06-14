@@ -4,10 +4,10 @@ import math
 import os
 
 from openai import AsyncOpenAI
-
-logger = logging.getLogger(__name__)
 from sqlalchemy import or_, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 from app.item.models import Item
 from app.place.models import Place
@@ -91,6 +91,29 @@ def _item_dict(i: Item) -> dict:
     }
 
 
+AREA_RADIUS_KM = 8
+
+
+async def _resolve_area_centroid(
+    db: AsyncSession, area: str
+) -> tuple[float, float] | None:
+    """Return (avg_lat, avg_lng) for places in the named area, or None."""
+    result = await db.execute(
+        text("""
+            SELECT AVG(latitude) AS lat, AVG(longitude) AS lng
+            FROM places_table
+            WHERE area ILIKE :area
+              AND latitude IS NOT NULL
+              AND longitude IS NOT NULL
+        """),
+        {"area": f"%{area}%"},
+    )
+    row = result.mappings().first()
+    if row and row["lat"] is not None:
+        return float(row["lat"]), float(row["lng"])
+    return None
+
+
 async def search_places(
     db: AsyncSession,
     query: str | None = None,
@@ -98,31 +121,23 @@ async def search_places(
     place_type: str | None = None,
     veg_friendly: bool | None = None,
     limit: int = 5,
-    reference_area: str | None = None,
-    # server-side injected — not in LLM tool schema
     user_lat: float | None = None,
     user_lng: float | None = None,
 ) -> list[dict]:
     fetch = min(limit * 2, 20)
 
-    # Resolve effective proximity reference
-    ref_lat: float | None = user_lat
-    ref_lng: float | None = user_lng
-    if reference_area:
-        centroid = await db.execute(
-            text("""
-                SELECT AVG(latitude) AS lat, AVG(longitude) AS lng
-                FROM places_table
-                WHERE area ILIKE :area
-                  AND latitude IS NOT NULL
-                  AND longitude IS NOT NULL
-            """),
-            {"area": f"%{reference_area}%"},
-        )
-        row = centroid.mappings().first()
-        if row and row["lat"]:
-            ref_lat = float(row["lat"])
-            ref_lng = float(row["lng"])
+    # Priority: named area centroid > user GPS > nothing
+    ref_lat: float | None = None
+    ref_lng: float | None = None
+    _ref_from_area = False
+
+    if area is not None:
+        centroid = await _resolve_area_centroid(db, area)
+        if centroid is not None:
+            ref_lat, ref_lng = centroid
+            _ref_from_area = True
+    elif user_lat is not None and user_lng is not None:
+        ref_lat, ref_lng = user_lat, user_lng
 
     # 1. Keyword search
     stmt = select(Place)
@@ -177,8 +192,15 @@ async def search_places(
             service = float(p.get("service_rating") or 5.0)
             rating_score = ((ambience + service) / 2) / 10.0 * 0.3
             proximity = 0.0
-            if ref_lat and ref_lng and p.get("latitude") and p.get("longitude"):
-                dist = _haversine_km(ref_lat, ref_lng, p["latitude"], p["longitude"])
+            p["_dist_km"] = None
+            if (
+                ref_lat is not None
+                and ref_lng is not None
+                and p.get("latitude") is not None
+                and p.get("longitude") is not None
+            ):
+                dist = _haversine_km(ref_lat, ref_lng, float(p["latitude"]), float(p["longitude"]))
+                p["_dist_km"] = dist
                 proximity = _proximity_score(dist) * 0.2
             p["final_score"] = sim + rating_score + proximity
         return places
@@ -195,6 +217,14 @@ async def search_places(
             seen.add(p["place_id"])
             merged.append(p)
     merged.sort(key=lambda x: x["final_score"], reverse=True)
+
+    # Hard radius cut for named-area queries; GPS queries stay weight-only
+    if _ref_from_area:
+        merged = [
+            p for p in merged
+            if p["_dist_km"] is None or p["_dist_km"] <= AREA_RADIUS_KM
+        ]
+
     merged = merged[:limit]
 
     # 5. Strip internal fields before returning to LLM
@@ -203,6 +233,7 @@ async def search_places(
         p.pop("longitude", None)
         p.pop("similarity", None)
         p.pop("final_score", None)
+        p.pop("_dist_km", None)
 
     return merged
 
@@ -214,7 +245,7 @@ async def search_items(
     course: str | None = None,
     meal_time: str | None = None,
     signature: bool | None = None,
-    place_id: int | None = None,
+    place_id: int | list[int] | None = None,
     limit: int = 8,
     # server-side injected — not in LLM tool schema
     user_lat: float | None = None,
@@ -238,7 +269,10 @@ async def search_items(
     if signature is not None:
         stmt = stmt.where(Item.signature == signature)
     if place_id is not None:
-        stmt = stmt.where(Item.place_id == place_id)
+        if isinstance(place_id, list):
+            stmt = stmt.where(Item.place_id.in_(place_id))
+        else:
+            stmt = stmt.where(Item.place_id == place_id)
     stmt = stmt.limit(fetch)
     rows = await db.execute(stmt)
     keyword_items = [_item_dict(i) for i in rows.scalars().all()]
