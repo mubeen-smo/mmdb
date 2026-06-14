@@ -98,11 +98,31 @@ async def search_places(
     place_type: str | None = None,
     veg_friendly: bool | None = None,
     limit: int = 5,
+    reference_area: str | None = None,
     # server-side injected — not in LLM tool schema
     user_lat: float | None = None,
     user_lng: float | None = None,
 ) -> list[dict]:
     fetch = min(limit * 2, 20)
+
+    # Resolve effective proximity reference
+    ref_lat: float | None = user_lat
+    ref_lng: float | None = user_lng
+    if reference_area:
+        centroid = await db.execute(
+            text("""
+                SELECT AVG(latitude) AS lat, AVG(longitude) AS lng
+                FROM places_table
+                WHERE area ILIKE :area
+                  AND latitude IS NOT NULL
+                  AND longitude IS NOT NULL
+            """),
+            {"area": f"%{reference_area}%"},
+        )
+        row = centroid.mappings().first()
+        if row and row["lat"]:
+            ref_lat = float(row["lat"])
+            ref_lng = float(row["lng"])
 
     # 1. Keyword search
     stmt = select(Place)
@@ -157,8 +177,8 @@ async def search_places(
             service = float(p.get("service_rating") or 5.0)
             rating_score = ((ambience + service) / 2) / 10.0 * 0.3
             proximity = 0.0
-            if user_lat and user_lng and p.get("latitude") and p.get("longitude"):
-                dist = _haversine_km(user_lat, user_lng, p["latitude"], p["longitude"])
+            if ref_lat and ref_lng and p.get("latitude") and p.get("longitude"):
+                dist = _haversine_km(ref_lat, ref_lng, p["latitude"], p["longitude"])
                 proximity = _proximity_score(dist) * 0.2
             p["final_score"] = sim + rating_score + proximity
         return places

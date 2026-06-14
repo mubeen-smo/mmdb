@@ -26,21 +26,40 @@ export default function AskPage() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(
-      (pos) => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => {},
-    );
-  }, []);
-
-  useEffect(() => {
     const el = scrollBoxRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, loading]);
 
+  const NEAR_ME_RE = /\b(near|around|close|closest|nearest)\s+me\b|\bmy\s+(area|location|vicinity)\b/i;
+
+  function wantsUserLocation(text: string): boolean {
+    return NEAR_ME_RE.test(text);
+  }
+
+  async function requestLocation(): Promise<{ lat: number; lng: number } | null> {
+    if (location) return location;
+    if (!navigator.geolocation) return null;
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          setLocation(loc);
+          resolve(loc);
+        },
+        () => resolve(null),
+        { timeout: 5000 },
+      );
+    });
+  }
+
   async function send(text: string) {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
+
+    let currentLocation = location;
+    if (wantsUserLocation(trimmed)) {
+      currentLocation = await requestLocation();
+    }
 
     setLoadingVerb(randomVerb());
 
@@ -56,8 +75,8 @@ export default function AskPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: history.map((m) => ({ role: m.role, content: m.content })),
-          lat: location?.lat ?? null,
-          lng: location?.lng ?? null,
+          lat: currentLocation?.lat ?? null,
+          lng: currentLocation?.lng ?? null,
           conversation_id: conversationId,
         }),
       });
