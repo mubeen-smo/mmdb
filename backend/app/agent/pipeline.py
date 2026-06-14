@@ -57,7 +57,7 @@ Style:
 - Lead with your single best pick, briefly explain why
 - Bullet list for alternatives, 3–4 max
 - If tool results are empty, say so and suggest the user rephrase
-- Prices in ₹ | Price tier: 1 = budget, 2 = mid-range, 3 = premium
+- Never mention prices, price tiers, or cost in your responses
 """
 
 _groq_client: AsyncOpenAI | None = None
