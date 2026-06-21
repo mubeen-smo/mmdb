@@ -38,10 +38,10 @@ export const LOADING_VERBS = [
 ];
 
 export const SUGGESTED_PROMPTS = [
-  "Best biryani in Hyderabad?",
-  "Veg-friendly cafes in Banjara Hills",
-  "Late-night food near Gachibowli",
-  "Signature dishes worth trying",
+  "Best biryani in Hyderabad",
+  "Suggest some good desserts",
+  "Top Hyderabadi dishes",
+  "Best street food places to try",
 ];
 
 export const GREETING_TEXT =
