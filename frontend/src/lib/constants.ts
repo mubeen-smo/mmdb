@@ -44,8 +44,7 @@ export const SUGGESTED_PROMPTS = [
   "Best street food places to try",
 ];
 
-export const GREETING_TEXT =
-  "Hello. I know Hyderabad's food scene well — from old-city biryanis to hidden breakfast spots and late-night dhabas. Tell me what you're looking for.";
+export const GREETING_TEXT = "What are you in the mood for today?";
 
 export const randomVerb = () =>
   LOADING_VERBS[Math.floor(Math.random() * LOADING_VERBS.length)];

@@ -119,8 +119,8 @@ export default function AskPage() {
               </span>
             </div>
             <div>
-              <h1 className="type-title-md leading-tight">MMDb Maven</h1>
-              <p className="type-label-sm text-secondary">Hyderabad food guide</p>
+              <h1 className="type-title-md leading-tight">Maven</h1>
+              <p className="type-label-sm text-secondary">Find what to eat, where to go</p>
             </div>
           </div>
 
