@@ -87,14 +87,6 @@ TOOL_DEFINITIONS: list[dict] = [
                         "type": "boolean",
                         "description": "Pass true to return only signature/must-try dishes.",
                     },
-                    "place_id": {
-                        "type": "integer",
-                        "description": (
-                            "Restrict results to one or more places by ID. Pass a single ID or a list of IDs. "
-                            "For location-scoped dish queries, first call search_places to get ranked place IDs, "
-                            "then pass those IDs here."
-                        ),
-                    },
                     "reference_area": {
                         "type": "string",
                         "description": (

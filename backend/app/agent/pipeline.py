@@ -13,9 +13,12 @@ from app.agent.memory import cleanup_old_conversations, load_conversation, save_
 from app.agent.tool_defs import TOOL_DEFINITIONS
 from app.agent.tools import list_areas, search_items, search_places
 
-MODEL = "llama-3.3-70b-versatile"
+MODEL = "openai/gpt-oss-120b"
 MAX_ROUNDS = 4
 ITEM_SCOPE_PLACES = 10
+MAX_HISTORY_MESSAGES = 8
+
+_OCCASION_WORDS = {"date", "romantic", "family", "anniversary", "celebration", "celebrate", "birthday", "special"}
 
 SYSTEM = """\
 You are MMDb Maven, an editorial food guide for Hyderabad, India.
@@ -79,6 +82,38 @@ def _get_groq() -> AsyncOpenAI:
     return _groq_client
 
 
+def _slim_for_llm(results: list[dict], occasion: bool = False) -> list[dict]:
+    """Trim each result to only the fields the LLM needs. Full dicts are never modified."""
+    slimmed = []
+    for r in results:
+        if "item" in r:
+            slimmed.append({
+                "item": r.get("item"),
+                "place_name": r.get("place_name"),
+                "diet": r.get("diet"),
+                "price": r.get("price"),
+                "signature": r.get("signature"),
+                "description": str(r.get("description") or "")[:100],
+            })
+        else:
+            entry: dict = {
+                "place_name": r.get("place_name"),
+                "area": r.get("area"),
+                "place_type": r.get("place_type"),
+                "veg_friendly": r.get("veg_friendly"),
+                "price_tier": r.get("price_tier"),
+                "rating": round(
+                    (float(r.get("ambience_rating") or 5) + float(r.get("service_rating") or 5)) / 2, 1
+                ),
+                "description": str(r.get("description") or "")[:100],
+            }
+            if occasion:
+                entry["vibe"] = r.get("vibe")
+                entry["good_for"] = r.get("good_for")
+            slimmed.append(entry)
+    return slimmed
+
+
 async def _dispatch_tool(
     name: str,
     args: dict,
@@ -131,6 +166,12 @@ async def _dispatch_tool(
             "results": [],
             "note": "No matching records found in the MMDb database. Tell the user nothing matched; do not invent place or dish names.",
         }
+    elif isinstance(result, list) and name in ("search_places", "search_items"):
+        occasion = name == "search_places" and bool(
+            _OCCASION_WORDS & set((args.get("query") or "").lower().split())
+        )
+        result = _slim_for_llm(result, occasion=occasion)[:4]
+
     return json.dumps(result, ensure_ascii=False, default=str)
 
 
@@ -176,13 +217,13 @@ async def run_pipeline(
         # Run cleanup opportunistically (cheap; no scheduler needed)
         await cleanup_old_conversations(db)
 
-    # Build the full message list: system + stored history + new user turn
+    # Build the full message list: system + capped history + new user turn
     user_turn = next((m for m in reversed(messages) if m["role"] == "user"), None)
     if not user_turn:
         return "I didn't receive a question. Please try again.", conversation_id
 
     llm_messages: list[dict] = [{"role": "system", "content": SYSTEM}]
-    llm_messages.extend(history)
+    llm_messages.extend(history[-MAX_HISTORY_MESSAGES:])
     llm_messages.append(user_turn)
 
     client = _get_groq()
@@ -197,7 +238,7 @@ async def run_pipeline(
                 messages=llm_messages,
                 tools=TOOL_DEFINITIONS,
                 tool_choice="none" if is_last_round else "auto",
-                max_tokens=1024,
+                max_tokens=800,
                 temperature=0.4,
             )
         except BadRequestError as exc:
@@ -207,7 +248,7 @@ async def run_pipeline(
                     model=MODEL,
                     messages=llm_messages,
                     tool_choice="none",
-                    max_tokens=1024,
+                    max_tokens=800,
                     temperature=0.4,
                 )
             else:
@@ -238,7 +279,7 @@ async def run_pipeline(
                             model=MODEL,
                             messages=llm_messages,
                             tool_choice="none",
-                            max_tokens=1024,
+                            max_tokens=800,
                             temperature=0.4,
                         )
                         reply = corrected.choices[0].message.content or reply
