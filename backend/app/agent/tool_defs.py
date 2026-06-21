@@ -69,8 +69,7 @@ TOOL_DEFINITIONS: list[dict] = [
                     },
                     "diet": {
                         "type": "string",
-                        "enum": ["veg", "non_veg", "egg"],
-                        "description": "Filter by dietary type.",
+                        "description": "Filter by dietary type: 'veg', 'non_veg', or 'egg'. Omit this parameter entirely when the user has not expressed a dietary preference.",
                     },
                     "course": {
                         "type": "string",

@@ -253,6 +253,10 @@ async def search_items(
 ) -> list[dict]:
     fetch = min(limit * 2, 20)
 
+    VALID_DIETS = {"veg", "non_veg", "egg"}
+    if diet is not None and diet not in VALID_DIETS:
+        diet = None
+
     # 1. Keyword search
     stmt = select(Item)
     if query:
