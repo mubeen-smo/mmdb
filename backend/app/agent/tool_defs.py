@@ -95,6 +95,14 @@ TOOL_DEFINITIONS: list[dict] = [
                             "then pass those IDs here."
                         ),
                     },
+                    "reference_area": {
+                        "type": "string",
+                        "description": (
+                            "Named area from the user's query when they ask for a dish near a location "
+                            "('ice cream near Madhapur' → 'Madhapur'). Do NOT set this for 'near me' queries — "
+                            "those use GPS coordinates injected server-side."
+                        ),
+                    },
                 },
                 "required": [],
             },

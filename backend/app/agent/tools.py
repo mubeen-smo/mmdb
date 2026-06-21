@@ -123,7 +123,8 @@ async def search_places(
     limit: int = 5,
     user_lat: float | None = None,
     user_lng: float | None = None,
-) -> list[dict]:
+    return_ids_only: bool = False,
+) -> list[dict] | list[int]:
     fetch = min(limit * 2, 20)
 
     # Priority: named area centroid > user GPS > nothing
@@ -227,6 +228,9 @@ async def search_places(
 
     merged = merged[:limit]
 
+    if return_ids_only:
+        return [p["place_id"] for p in merged]
+
     # 5. Strip internal fields before returning to LLM
     for p in merged:
         p.pop("latitude", None)
@@ -250,6 +254,8 @@ async def search_items(
     # server-side injected — not in LLM tool schema
     user_lat: float | None = None,
     user_lng: float | None = None,
+    # picked up by _dispatch_tool for location scoping; ignored inside this function
+    reference_area: str | None = None,
 ) -> list[dict]:
     fetch = min(limit * 2, 20)
 

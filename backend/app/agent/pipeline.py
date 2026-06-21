@@ -13,6 +13,7 @@ from app.agent.tools import list_areas, search_items, search_places
 
 MODEL = "llama-3.3-70b-versatile"
 MAX_ROUNDS = 4
+ITEM_SCOPE_PLACES = 10
 
 SYSTEM = """\
 You are MMDb Maven, an editorial food guide for Hyderabad, India.
@@ -92,6 +93,22 @@ async def _dispatch_tool(
             **args,
         )
     elif name == "search_items":
+        reference_area = args.get("reference_area")
+        has_location = (
+            (reference_area and reference_area.strip())
+            or (user_lat is not None and user_lng is not None)
+        )
+        if has_location:
+            place_ids = await search_places(
+                db,
+                area=reference_area,
+                user_lat=user_lat,
+                user_lng=user_lng,
+                return_ids_only=True,
+                limit=ITEM_SCOPE_PLACES,
+            )
+            if place_ids:
+                args["place_id"] = place_ids
         result = await search_items(
             db,
             user_lat=user_lat,
