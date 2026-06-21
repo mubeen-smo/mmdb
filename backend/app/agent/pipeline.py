@@ -202,16 +202,11 @@ async def run_pipeline(
             )
         except BadRequestError as exc:
             if "tool_use_failed" in str(exc):
-                logger.warning("Groq tool_use_failed — retrying with format correction: %s", exc)
-                llm_messages.append({
-                    "role": "user",
-                    "content": "Please use valid JSON tool calls. Do not use XML-style function syntax.",
-                })
+                logger.warning("Groq tool_use_failed — retrying without tools: %s", exc)
                 response = await client.chat.completions.create(
                     model=MODEL,
                     messages=llm_messages,
-                    tools=TOOL_DEFINITIONS,
-                    tool_choice="auto",
+                    tool_choice="none",
                     max_tokens=1024,
                     temperature=0.4,
                 )
@@ -225,27 +220,30 @@ async def run_pipeline(
             reply = assistant_msg.content or "No answer generated. Try rephrasing."
 
             # Grounding check: verify every bolded name exists in the DB
-            bolded = _extract_bolded(reply)
-            if bolded:
-                unknown = await _unknown_names(db, bolded)
-                if unknown:
-                    logger.warning("Grounding violation — unknown names: %s", unknown)
-                    correction = (
-                        f"CORRECTION: The following names you mentioned are not in the MMDb database: "
-                        f"{', '.join(unknown)}. "
-                        "Rewrite your response using only the tool results already provided above, "
-                        "or tell the user that nothing matched their query. Do not invent any names."
-                    )
-                    llm_messages.append({"role": "assistant", "content": reply})
-                    llm_messages.append({"role": "user", "content": correction})
-                    corrected = await client.chat.completions.create(
-                        model=MODEL,
-                        messages=llm_messages,
-                        tool_choice="none",
-                        max_tokens=1024,
-                        temperature=0.4,
-                    )
-                    reply = corrected.choices[0].message.content or reply
+            try:
+                bolded = _extract_bolded(reply)
+                if bolded:
+                    unknown = await _unknown_names(db, bolded)
+                    if unknown:
+                        logger.warning("Grounding violation — unknown names: %s", unknown)
+                        correction = (
+                            f"CORRECTION: The following names you mentioned are not in the MMDb database: "
+                            f"{', '.join(unknown)}. "
+                            "Rewrite your response using only the tool results already provided above, "
+                            "or tell the user that nothing matched their query. Do not invent any names."
+                        )
+                        llm_messages.append({"role": "assistant", "content": reply})
+                        llm_messages.append({"role": "user", "content": correction})
+                        corrected = await client.chat.completions.create(
+                            model=MODEL,
+                            messages=llm_messages,
+                            tool_choice="none",
+                            max_tokens=1024,
+                            temperature=0.4,
+                        )
+                        reply = corrected.choices[0].message.content or reply
+            except Exception as exc:
+                logger.warning("Grounding check failed, skipping: %s", exc)
 
             # Persist: append user turn + assistant reply to history
             if conversation_id:
