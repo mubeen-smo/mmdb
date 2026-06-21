@@ -1,8 +1,10 @@
 import json
 import logging
 import os
+import re
 
 from openai import AsyncOpenAI, BadRequestError
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
@@ -119,7 +121,38 @@ async def _dispatch_tool(
         result = await list_areas(db)
     else:
         result = {"error": f"Unknown tool: {name}"}
+
+    is_empty = (isinstance(result, list) and not result) or (
+        isinstance(result, dict)
+        and any(isinstance(result.get(k), list) and not result[k] for k in ("places", "items", "results"))
+    )
+    if is_empty:
+        result = {
+            "results": [],
+            "note": "No matching records found in the MMDb database. Tell the user nothing matched; do not invent place or dish names.",
+        }
     return json.dumps(result, ensure_ascii=False, default=str)
+
+
+def _extract_bolded(text_str: str) -> list[str]:
+    return re.findall(r'\*\*([^*]+)\*\*', text_str)
+
+
+async def _unknown_names(db: AsyncSession, names: list[str]) -> list[str]:
+    unknown = []
+    for name in names:
+        row = await db.execute(
+            text("""
+                SELECT 1 FROM places_table WHERE place_name ILIKE :n
+                UNION ALL
+                SELECT 1 FROM items_table WHERE item ILIKE :n
+                LIMIT 1
+            """),
+            {"n": name},
+        )
+        if row.first() is None:
+            unknown.append(name)
+    return unknown
 
 
 async def run_pipeline(
@@ -169,11 +202,16 @@ async def run_pipeline(
             )
         except BadRequestError as exc:
             if "tool_use_failed" in str(exc):
-                logger.warning("Groq tool_use_failed — retrying without tools: %s", exc)
+                logger.warning("Groq tool_use_failed — retrying with format correction: %s", exc)
+                llm_messages.append({
+                    "role": "user",
+                    "content": "Please use valid JSON tool calls. Do not use XML-style function syntax.",
+                })
                 response = await client.chat.completions.create(
                     model=MODEL,
                     messages=llm_messages,
-                    tool_choice="none",
+                    tools=TOOL_DEFINITIONS,
+                    tool_choice="auto",
                     max_tokens=1024,
                     temperature=0.4,
                 )
@@ -185,6 +223,30 @@ async def run_pipeline(
         # No tool calls → final answer
         if not assistant_msg.tool_calls:
             reply = assistant_msg.content or "No answer generated. Try rephrasing."
+
+            # Grounding check: verify every bolded name exists in the DB
+            bolded = _extract_bolded(reply)
+            if bolded:
+                unknown = await _unknown_names(db, bolded)
+                if unknown:
+                    logger.warning("Grounding violation — unknown names: %s", unknown)
+                    correction = (
+                        f"CORRECTION: The following names you mentioned are not in the MMDb database: "
+                        f"{', '.join(unknown)}. "
+                        "Rewrite your response using only the tool results already provided above, "
+                        "or tell the user that nothing matched their query. Do not invent any names."
+                    )
+                    llm_messages.append({"role": "assistant", "content": reply})
+                    llm_messages.append({"role": "user", "content": correction})
+                    corrected = await client.chat.completions.create(
+                        model=MODEL,
+                        messages=llm_messages,
+                        tool_choice="none",
+                        max_tokens=1024,
+                        temperature=0.4,
+                    )
+                    reply = corrected.choices[0].message.content or reply
+
             # Persist: append user turn + assistant reply to history
             if conversation_id:
                 updated = list(history) + [
