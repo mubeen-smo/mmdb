@@ -10,7 +10,7 @@
     "id": "tooluse-veg-area",
     "kind": "tool_use",
     "turns": ["veg-friendly places in Banjara Hills"],
-    "rubric": "Returns vegetarian-friendly places located in Banjara Hills. Does not list non-veg-only spots or places in other areas. Bolded names are real.",
+    "rubric": "Agent recommends at least one place in Banjara Hills that it describes as veg-friendly. Do not fail based on the name of the place — only on whether the agent addressed the veg-friendly requirement.",
     "max_latency_ms": 60000
   },
   {

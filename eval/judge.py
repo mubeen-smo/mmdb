@@ -85,6 +85,10 @@ async def _llm_judge(result: dict) -> dict:
         f"You are grading a food-recommendation chatbot for Hyderabad, India.\n\n"
         f"CASE RUBRIC:\n{result['rubric']}\n\n"
         f"TRANSCRIPT:\n{transcript}\n\n"
+        "Do not infer dietary suitability from the name of a place. Only assess whether "
+        "the agent's answer addressed the user's request — if the agent said a place is "
+        "veg-friendly, evaluate whether it answered the question, not whether the name "
+        "sounds vegetarian.\n\n"
         "Grade strictly. Reply with ONLY a JSON object: "
         '{\"pass\": true|false, \"score\": 1-5, \"reason\": \"one sentence\"}.'
     )

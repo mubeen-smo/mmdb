@@ -27,7 +27,7 @@ async def run_case(base_url: str, case: dict, default_geo: dict | None = None) -
         page = await context.new_page()
 
         await page.goto(f"{base_url.rstrip('/')}/ask", wait_until="domcontentloaded")
-        box = page.locator('input[type="text"]')
+        box = page.get_by_placeholder("Ask about biryani, cafes, late-night eats…")
 
         turns: list[dict] = []
         for prompt in case["turns"]:

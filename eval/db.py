@@ -24,7 +24,7 @@ async def load_known_names() -> set[str] | None:
     if not dsn:
         return None
 
-    conn = await asyncpg.connect(dsn, ssl="require")
+    conn = await asyncpg.connect(dsn, ssl="require", statement_cache_size=0)
     try:
         places = await conn.fetch("SELECT place_name FROM places_table")
         items = await conn.fetch("SELECT item FROM items_table")
