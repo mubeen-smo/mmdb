@@ -37,14 +37,6 @@ export default function AskPage() {
     el.style.height = `${Math.min(el.scrollHeight, 128)}px`;
   }, [input]);
 
-  useEffect(() => {
-    if (!loading) return;
-    const interval = setInterval(() => {
-      setLoadingVerb(prev => nextVerb(prev));
-    }, 2500);
-    return () => clearInterval(interval);
-  }, [loading]);
-
   const NEAR_ME_RE = /\b(near|around|close|closest|nearest)\s+me\b|\bmy\s+(area|location|vicinity)\b/i;
 
   function wantsUserLocation(text: string): boolean {
@@ -137,7 +129,7 @@ export default function AskPage() {
       {/* h-[calc(100dvh-3.5rem)] = full viewport minus mobile navbar (h-14)
           md:h-[calc(100dvh-5rem)] = full viewport minus desktop navbar (h-20)
           dvh shrinks when soft keyboard appears, keeping input pinned */}
-      <div className="flex flex-col h-[calc(100dvh-3.5rem)] md:h-[calc(100dvh-5rem)] overflow-hidden">
+      <div className="flex flex-col h-[calc(100dvh-3.5rem)] md:h-[calc(100dvh-5rem)] max-h-[calc(100dvh-3.5rem)] md:max-h-[calc(100dvh-5rem)] overflow-hidden">
 
         {/* Chat header */}
         <header className="shrink-0 flex items-center gap-3 px-4 md:px-6 py-3.5 border-b border-outline-variant/20 bg-surface-container-low/30">
@@ -217,6 +209,9 @@ export default function AskPage() {
                   </span>
                 </div>
                 <div className="bg-surface-container rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-3">
+                  <span className="text-xs text-secondary/70 font-medium tracking-wide">
+                    {loadingVerb}
+                  </span>
                   <div className="flex items-center gap-[3px]">
                     {[0, 1, 2].map(i => (
                       <span
@@ -226,9 +221,6 @@ export default function AskPage() {
                       />
                     ))}
                   </div>
-                  <span className="text-xs text-secondary/70 font-medium tracking-wide">
-                    {loadingVerb}…
-                  </span>
                 </div>
               </div>
             )}
@@ -264,6 +256,14 @@ export default function AskPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKey}
+                onFocus={(e) => {
+                  e.target.scrollIntoView = () => {};
+                  if (scrollBoxRef.current) {
+                    setTimeout(() => {
+                      scrollBoxRef.current!.scrollTop = scrollBoxRef.current!.scrollHeight;
+                    }, 50);
+                  }
+                }}
                 placeholder="Ask about biryani, cafes, late-night eats…"
                 disabled={loading}
                 className="flex-1 bg-transparent resize-none overflow-y-auto text-sm leading-relaxed max-h-32 py-1 focus:outline-none disabled:opacity-50 placeholder:text-secondary/50"
