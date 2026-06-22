@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
-import { GREETING_TEXT, SUGGESTED_PROMPTS, randomVerb } from "@/lib/constants";
+import { GREETING_TEXT, SUGGESTED_PROMPTS, pickVerb } from "@/lib/constants";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -18,7 +18,7 @@ export default function AskPage() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [loadingVerb, setLoadingVerb] = useState(() => randomVerb());
+  const [loadingVerb, setLoadingVerb] = useState(() => pickVerb(""));
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
 
@@ -61,7 +61,7 @@ export default function AskPage() {
       currentLocation = await requestLocation();
     }
 
-    setLoadingVerb(randomVerb());
+    setLoadingVerb(pickVerb(trimmed));
 
     const userMsg: Message = { role: "user", content: trimmed };
     const history = [...messages, userMsg];
@@ -193,10 +193,13 @@ export default function AskPage() {
                     auto_awesome
                   </span>
                 </div>
-                <div className="bg-surface-container rounded-2xl rounded-tl-sm px-4 py-3">
-                  <span className="type-body-md text-secondary animate-pulse">
-                    {loadingVerb}
-                  </span>
+                <div className="bg-surface-container rounded-2xl rounded-tl-sm px-4 py-3 flex flex-col gap-1.5">
+                  <div className="flex gap-1 items-center h-4">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                  <span className="type-label-sm text-secondary/60">{loadingVerb}</span>
                 </div>
               </div>
             )}
