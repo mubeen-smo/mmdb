@@ -46,6 +46,7 @@ export default function RootLayout({
       className={`${hankenGrotesk.variable} ${inter.variable}`}
     >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: "history.scrollRestoration='manual'" }} />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link
           rel="stylesheet"
@@ -73,10 +74,4 @@ export default function RootLayout({
       <body className="flex flex-col bg-surface text-on-surface antialiased">
         <Navbar />
         <main className="flex-1">
-          <PageWrapper>{children}</PageWrapper>
-        </main>
-        <Footer />
-      </body>
-    </html>
-  );
-}
+          <PageWrapper
