@@ -1,7 +1,9 @@
-import json
+import asyncio
 import logging
 import math
 import os
+import time
+from contextlib import asynccontextmanager
 
 from openai import AsyncOpenAI
 from sqlalchemy import or_, select, text
@@ -15,6 +17,17 @@ from app.place.models import Place
 EMBED_MODEL = "text-embedding-3-small"
 
 _openai_client: AsyncOpenAI | None = None
+
+
+@asynccontextmanager
+async def _timed(stage: str, cid: str | None = None):
+    t0 = time.perf_counter()
+    try:
+        yield
+    finally:
+        ms = (time.perf_counter() - t0) * 1000
+        extra = f" cid={cid}" if cid else ""
+        logger.info("stage=%s ms=%.1f%s", stage, ms, extra)
 
 
 def _get_openai() -> AsyncOpenAI:
@@ -140,7 +153,10 @@ async def search_places(
     elif user_lat is not None and user_lng is not None:
         ref_lat, ref_lng = user_lat, user_lng
 
-    # 1. Keyword search
+    # 1. Start embedding in background while keyword query runs
+    embed_task = asyncio.ensure_future(_embed(query)) if query else None
+
+    # Keyword search
     stmt = select(Place)
     if query:
         stmt = stmt.where(or_(
@@ -155,35 +171,40 @@ async def search_places(
     if veg_friendly is not None:
         stmt = stmt.where(Place.veg_friendly == veg_friendly)
     stmt = stmt.limit(fetch)
-    rows = await db.execute(stmt)
+    async with _timed("keyword_db"):
+        rows = await db.execute(stmt)
     keyword_places = [_place_dict(p) for p in rows.scalars().all()]
 
-    # 2. Semantic search
+    # 2. Semantic search — embedding was running concurrently
     semantic_places: list[dict] = []
-    if query:
+    if query and embed_task is not None:
         try:
-            vec = _vec_str(await _embed(query))
-            sem_rows = await db.execute(
-                text("""
-                    SELECT
-                        p.place_id, p.place_name, p.area,
-                        p.type AS place_type, p.cuisines,
-                        p.price_tier, p.veg_friendly, p.vibe, p.good_for,
-                        p.meal_periods, p.ambience_rating, p.service_rating,
-                        p.open_time, p.latitude, p.longitude,
-                        LEFT(p.description, 200) AS description,
-                        1 - (e.embedding <=> :vec ::vector) AS similarity
-                    FROM embeddings e
-                    JOIN places_table p ON p.place_id = e.source_id
-                    WHERE e.source_type = 'place'
-                    ORDER BY e.embedding <=> :vec ::vector
-                    LIMIT :limit
-                """),
-                {"vec": vec, "limit": fetch},
-            )
+            async with _timed("embed_query"):
+                vec = _vec_str(await embed_task)
+            async with _timed("semantic_db"):
+                sem_rows = await db.execute(
+                    text("""
+                        SELECT
+                            p.place_id, p.place_name, p.area,
+                            p.type AS place_type, p.cuisines,
+                            p.price_tier, p.veg_friendly, p.vibe, p.good_for,
+                            p.meal_periods, p.ambience_rating, p.service_rating,
+                            p.open_time, p.latitude, p.longitude,
+                            LEFT(p.description, 200) AS description,
+                            1 - (e.embedding <=> :vec ::vector) AS similarity
+                        FROM embeddings e
+                        JOIN places_table p ON p.place_id = e.source_id
+                        WHERE e.source_type = 'place'
+                        ORDER BY e.embedding <=> :vec ::vector
+                        LIMIT :limit
+                    """),
+                    {"vec": vec, "limit": fetch},
+                )
             semantic_places = [dict(r) for r in sem_rows.mappings().all()]
         except Exception as exc:
             logger.warning("Embedding failed, using keyword-only search: %s", exc)
+            if embed_task and not embed_task.done():
+                embed_task.cancel()
 
     # 3. Score
     def _score(places: list[dict], base_sim: float = 0.5) -> list[dict]:
@@ -263,7 +284,10 @@ async def search_items(
     if diet is not None and diet not in VALID_DIETS:
         diet = None
 
-    # 1. Keyword search
+    # 1. Start embedding in background while keyword query runs
+    embed_task = asyncio.ensure_future(_embed(query)) if query else None
+
+    # Keyword search
     stmt = select(Item)
     if query:
         stmt = stmt.where(or_(
@@ -284,34 +308,39 @@ async def search_items(
         else:
             stmt = stmt.where(Item.place_id == place_id)
     stmt = stmt.limit(fetch)
-    rows = await db.execute(stmt)
+    async with _timed("keyword_db"):
+        rows = await db.execute(stmt)
     keyword_items = [_item_dict(i) for i in rows.scalars().all()]
 
-    # 2. Semantic search
+    # 2. Semantic search — embedding was running concurrently
     semantic_items: list[dict] = []
-    if query:
+    if query and embed_task is not None:
         try:
-            vec = _vec_str(await _embed(query))
-            sem_rows = await db.execute(
-                text("""
-                    SELECT
-                        i.item_id, i.place_id, i.item, i.place_name,
-                        i.diet, i.course, i.meal_time, i.price,
-                        i.signature, i.item_rating,
-                        LEFT(i.description, 200) AS description,
-                        1 - (e.embedding <=> :vec ::vector) AS similarity
-                    FROM embeddings e
-                    JOIN items_table i
-                      ON i.item_id = e.source_id AND i.place_id = e.source_id2
-                    WHERE e.source_type = 'item'
-                    ORDER BY e.embedding <=> :vec ::vector
-                    LIMIT :limit
-                """),
-                {"vec": vec, "limit": fetch},
-            )
+            async with _timed("embed_query"):
+                vec = _vec_str(await embed_task)
+            async with _timed("semantic_db"):
+                sem_rows = await db.execute(
+                    text("""
+                        SELECT
+                            i.item_id, i.place_id, i.item, i.place_name,
+                            i.diet, i.course, i.meal_time, i.price,
+                            i.signature, i.item_rating,
+                            LEFT(i.description, 200) AS description,
+                            1 - (e.embedding <=> :vec ::vector) AS similarity
+                        FROM embeddings e
+                        JOIN items_table i
+                          ON i.item_id = e.source_id AND i.place_id = e.source_id2
+                        WHERE e.source_type = 'item'
+                        ORDER BY e.embedding <=> :vec ::vector
+                        LIMIT :limit
+                    """),
+                    {"vec": vec, "limit": fetch},
+                )
             semantic_items = [dict(r) for r in sem_rows.mappings().all()]
         except Exception as exc:
             logger.warning("Embedding failed, using keyword-only search: %s", exc)
+            if embed_task and not embed_task.done():
+                embed_task.cancel()
 
     # 3. Score
     def _score(items: list[dict], base_sim: float = 0.5) -> list[dict]:

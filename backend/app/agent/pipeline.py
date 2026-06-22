@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import re
+import time
 
 from openai import AsyncOpenAI, BadRequestError
 from sqlalchemy import text
@@ -227,12 +228,15 @@ async def run_pipeline(
     llm_messages.append(user_turn)
 
     client = _get_groq()
+    cid = conversation_id or "none"
+    pipeline_t0 = time.perf_counter()
 
     # Agent loop — max MAX_ROUNDS before forcing a final answer
     for round_idx in range(MAX_ROUNDS):
         is_last_round = round_idx == MAX_ROUNDS - 1
 
         try:
+            t0 = time.perf_counter()
             response = await client.chat.completions.create(
                 model=MODEL,
                 messages=llm_messages,
@@ -241,9 +245,11 @@ async def run_pipeline(
                 max_tokens=800,
                 temperature=0.4,
             )
+            logger.info("stage=llm_round round=%d ms=%.1f cid=%s", round_idx, (time.perf_counter() - t0) * 1000, cid)
         except BadRequestError as exc:
             if "tool_use_failed" in str(exc):
                 logger.warning("Groq tool_use_failed — retrying without tools: %s", exc)
+                t0 = time.perf_counter()
                 response = await client.chat.completions.create(
                     model=MODEL,
                     messages=llm_messages,
@@ -251,6 +257,7 @@ async def run_pipeline(
                     max_tokens=800,
                     temperature=0.4,
                 )
+                logger.info("stage=llm_round round=%d ms=%.1f cid=%s", round_idx, (time.perf_counter() - t0) * 1000, cid)
             else:
                 raise
 
@@ -275,6 +282,7 @@ async def run_pipeline(
                         )
                         llm_messages.append({"role": "assistant", "content": reply})
                         llm_messages.append({"role": "user", "content": correction})
+                        t0 = time.perf_counter()
                         corrected = await client.chat.completions.create(
                             model=MODEL,
                             messages=llm_messages,
@@ -282,6 +290,7 @@ async def run_pipeline(
                             max_tokens=800,
                             temperature=0.4,
                         )
+                        logger.info("stage=llm_round round=%d ms=%.1f cid=%s", round_idx, (time.perf_counter() - t0) * 1000, cid)
                         reply = corrected.choices[0].message.content or reply
             except Exception as exc:
                 logger.warning("Grounding check failed, skipping: %s", exc)
@@ -293,6 +302,7 @@ async def run_pipeline(
                     {"role": "assistant", "content": reply},
                 ]
                 await save_conversation(db, conversation_id, updated)
+            logger.info("stage=pipeline_total ms=%.1f cid=%s", (time.perf_counter() - pipeline_t0) * 1000, cid)
             return reply, conversation_id
 
         # Append the assistant's tool-call turn to the message list
@@ -335,4 +345,5 @@ async def run_pipeline(
             })
 
     # Should not normally reach here (last round forces tool_choice="none")
+    logger.info("stage=pipeline_total ms=%.1f cid=%s", (time.perf_counter() - pipeline_t0) * 1000, cid)
     return "I couldn't produce an answer. Please try rephrasing.", conversation_id
