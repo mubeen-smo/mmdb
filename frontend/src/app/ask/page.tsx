@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
-import { GREETING_TEXT, SUGGESTED_PROMPTS, pickVerb } from "@/lib/constants";
+import { GREETING_TEXT, SUGGESTED_PROMPTS, nextVerb, initialVerb } from "@/lib/constants";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -18,12 +18,12 @@ export default function AskPage() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [loadingVerb, setLoadingVerb] = useState(() => pickVerb(""));
+  const [loadingVerb, setLoadingVerb] = useState(() => initialVerb());
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
 
   const scrollBoxRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const el = scrollBoxRef.current;
@@ -61,12 +61,13 @@ export default function AskPage() {
       currentLocation = await requestLocation();
     }
 
-    setLoadingVerb(pickVerb(trimmed));
+    setLoadingVerb(prev => nextVerb(prev));
 
     const userMsg: Message = { role: "user", content: trimmed };
     const history = [...messages, userMsg];
     setMessages(history);
     setInput("");
+    if (textareaRef.current) textareaRef.current.style.height = "auto";
     setLoading(true);
 
     try {
@@ -92,11 +93,18 @@ export default function AskPage() {
       ]);
     } finally {
       setLoading(false);
-      inputRef.current?.focus();
+      textareaRef.current?.focus();
     }
   }
 
-  function handleKey(e: React.KeyboardEvent<HTMLInputElement>) {
+  function handleInput(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    setInput(e.target.value);
+    const el = e.target;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }
+
+  function handleKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       send(input);
@@ -104,30 +112,97 @@ export default function AskPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-80px)] max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-md">
-      <div className="flex gap-gutter h-full overflow-hidden">
+    <>
+      <style>{`
+        @keyframes msgIn {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .msg-enter {
+          animation: msgIn 0.18s ease-out forwards;
+        }
+      `}</style>
+      <div className="flex flex-col h-[calc(100vh-80px)] max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-md">
+        <div className="flex gap-gutter h-full overflow-hidden">
 
-        <section className="flex-grow flex flex-col bg-surface-container-low/70 backdrop-blur-sm rounded-xl border border-outline-variant/30 overflow-hidden max-w-3xl">
+          <section className="flex-grow flex flex-col bg-surface-container-low/70 backdrop-blur-sm rounded-xl border border-outline-variant/30 overflow-hidden max-w-3xl">
 
-          <div className="px-6 py-4 border-b border-surface-container-highest flex items-center gap-3 bg-surface-container-low/50 shrink-0">
-            <div className="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center shrink-0">
-              <span
-                className="material-symbols-outlined text-on-primary-container select-none text-[18px]"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                auto_awesome
-              </span>
+            <div className="px-6 py-4 border-b border-surface-container-highest flex items-center gap-3 bg-surface-container-low/50 shrink-0">
+              <div className="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center shrink-0">
+                <span
+                  className="material-symbols-outlined text-on-primary-container select-none text-[18px]"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  auto_awesome
+                </span>
+              </div>
+              <div>
+                <h1 className="type-title-md leading-tight">Maven</h1>
+                <p className="type-label-sm text-secondary">Find what to eat, where to go</p>
+              </div>
             </div>
-            <div>
-              <h1 className="type-title-md leading-tight">Maven</h1>
-              <p className="type-label-sm text-secondary">Find what to eat, where to go</p>
-            </div>
-          </div>
 
-          <div ref={scrollBoxRef} className="flex-grow overflow-y-auto px-6 py-5 flex flex-col gap-5">
-            {messages.map((msg, i) =>
-              msg.role === "assistant" ? (
-                <div key={i} className="flex gap-3 max-w-[88%]">
+            <div ref={scrollBoxRef} className="flex-1 min-h-0 overflow-y-auto px-6 py-5 flex flex-col gap-4">
+              {messages.map((msg, i) =>
+                msg.role === "assistant" ? (
+                  <div key={i} className="msg-enter flex gap-3 max-w-[82%]">
+                    <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary-container flex items-center justify-center mt-0.5">
+                      <span
+                        className="material-symbols-outlined text-on-primary-container select-none"
+                        style={{ fontSize: 14, fontVariationSettings: "'FILL' 1" }}
+                      >
+                        auto_awesome
+                      </span>
+                    </div>
+                    <div className="bg-surface-container rounded-2xl rounded-tl-sm px-4 py-2.5">
+                      <ReactMarkdown
+                        components={{
+                          p: ({ children }) => (
+                            <p className="type-body-md text-on-surface leading-relaxed mb-2 last:mb-0">
+                              {children}
+                            </p>
+                          ),
+                          ul: ({ children }) => (
+                            <ul className="mt-2 mb-2 last:mb-0 space-y-1 pl-1">
+                              {children}
+                            </ul>
+                          ),
+                          li: ({ children }) => (
+                            <li className="type-body-md text-on-surface flex gap-2">
+                              <span className="text-primary mt-0.5 shrink-0">·</span>
+                              <span>{children}</span>
+                            </li>
+                          ),
+                          strong: ({ children }) => (
+                            <strong className="font-semibold text-on-surface">
+                              {children}
+                            </strong>
+                          ),
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                ) : (
+                  <div key={i} className="msg-enter flex gap-3 max-w-[72%] self-end flex-row-reverse">
+                    <div className="flex-shrink-0 w-7 h-7 rounded-full bg-secondary-container flex items-center justify-center mt-0.5">
+                      <span
+                        className="material-symbols-outlined text-on-secondary-container select-none"
+                        style={{ fontSize: 14 }}
+                      >
+                        person
+                      </span>
+                    </div>
+                    <div className="bg-primary/10 border border-primary/15 rounded-2xl rounded-tr-sm px-4 py-2.5">
+                      <p className="type-body-md text-on-surface">{msg.content}</p>
+                    </div>
+                  </div>
+                )
+              )}
+
+              {loading && (
+                <div className="msg-enter flex gap-3 max-w-[82%]">
                   <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary-container flex items-center justify-center mt-0.5">
                     <span
                       className="material-symbols-outlined text-on-primary-container select-none"
@@ -136,146 +211,88 @@ export default function AskPage() {
                       auto_awesome
                     </span>
                   </div>
-                  <div className="bg-surface-container rounded-2xl rounded-tl-sm px-4 py-3">
-                    <ReactMarkdown
-                      components={{
-                        p: ({ children }) => (
-                          <p className="type-body-md text-on-surface leading-relaxed mb-2 last:mb-0">
-                            {children}
-                          </p>
-                        ),
-                        ul: ({ children }) => (
-                          <ul className="mt-2 mb-2 last:mb-0 space-y-1 pl-1">
-                            {children}
-                          </ul>
-                        ),
-                        li: ({ children }) => (
-                          <li className="type-body-md text-on-surface flex gap-2">
-                            <span className="text-primary mt-0.5 shrink-0">·</span>
-                            <span>{children}</span>
-                          </li>
-                        ),
-                        strong: ({ children }) => (
-                          <strong className="font-semibold text-on-surface">
-                            {children}
-                          </strong>
-                        ),
-                      }}
-                    >
-                      {msg.content}
-                    </ReactMarkdown>
+                  <div className="bg-surface-container rounded-2xl rounded-tl-sm px-4 py-2.5">
+                    <div className="flex items-center gap-2.5 py-1">
+                      <span className="inline-block w-3.5 h-3.5 rounded-full border-2 border-current border-t-transparent animate-spin opacity-50" />
+                      <span className="type-label-sm text-secondary">{loadingVerb}…</span>
+                    </div>
                   </div>
                 </div>
-              ) : (
-                <div key={i} className="flex gap-3 max-w-[88%] self-end flex-row-reverse">
-                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-secondary-container flex items-center justify-center mt-0.5">
-                    <span
-                      className="material-symbols-outlined text-on-secondary-container select-none"
-                      style={{ fontSize: 14 }}
-                    >
-                      person
-                    </span>
+              )}
+
+              {messages.length === 1 && !loading && (
+                <div className="mt-1">
+                  <p className="type-label-sm text-secondary/70 mb-3 uppercase tracking-widest text-xs">
+                    Try asking
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {SUGGESTED_PROMPTS.map((prompt) => (
+                      <button
+                        key={prompt}
+                        onClick={() => send(prompt)}
+                        className="px-4 py-2 bg-surface-container border border-outline-variant rounded-full type-label-sm text-on-surface-variant hover:border-primary hover:text-primary transition-colors text-left"
+                      >
+                        {prompt}
+                      </button>
+                    ))}
                   </div>
-                  <div className="bg-primary/10 border border-primary/15 rounded-2xl rounded-tr-sm px-4 py-3">
-                    <p className="type-body-md text-on-surface">{msg.content}</p>
-                  </div>
                 </div>
-              )
-            )}
+              )}
 
-            {loading && (
-              <div className="flex gap-3 max-w-[88%]">
-                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary-container flex items-center justify-center mt-0.5">
-                  <span
-                    className="material-symbols-outlined text-on-primary-container select-none"
-                    style={{ fontSize: 14, fontVariationSettings: "'FILL' 1" }}
-                  >
-                    auto_awesome
-                  </span>
-                </div>
-                <div className="bg-surface-container rounded-2xl rounded-tl-sm px-4 py-3 flex flex-col gap-1.5">
-                  <div className="flex gap-1 items-center h-4">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
-                  <span className="type-label-sm text-secondary/60">{loadingVerb}</span>
-                </div>
-              </div>
-            )}
-
-            {messages.length === 1 && !loading && (
-              <div className="mt-1">
-                <p className="type-label-sm text-secondary/70 mb-3 uppercase tracking-widest text-xs">
-                  Try asking
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {SUGGESTED_PROMPTS.map((prompt) => (
-                    <button
-                      key={prompt}
-                      onClick={() => send(prompt)}
-                      className="px-4 py-2 bg-surface-container border border-outline-variant rounded-full type-label-sm text-on-surface-variant hover:border-primary hover:text-primary transition-colors text-left"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div />
-          </div>
-
-          <div className="px-6 py-4 border-t border-surface-container-highest shrink-0">
-            <div className="flex items-center gap-3 bg-surface-container rounded-full px-5 py-2.5 border border-outline-variant/40 focus-within:border-primary/50 transition-colors">
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKey}
-                placeholder="Ask about biryani, cafes, late-night eats…"
-                disabled={loading}
-                className="flex-grow bg-transparent border-none focus:outline-none type-body-md py-1 disabled:opacity-50 placeholder:text-secondary/50"
-              />
-              <button
-                onClick={() => send(input)}
-                disabled={!input.trim() || loading}
-                className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary hover:opacity-90 active:scale-95 transition-all shrink-0 disabled:opacity-30 disabled:pointer-events-none"
-              >
-                <span
-                  className="material-symbols-outlined select-none"
-                  style={{ fontSize: 16, fontVariationSettings: "'FILL' 1" }}
-                >
-                  send
-                </span>
-              </button>
+              <div />
             </div>
-            <p className="type-label-sm text-secondary/40 text-center mt-2.5 text-xs">
-              Recommendations are from the MMDb database only
-            </p>
-          </div>
-        </section>
 
-        <aside className="hidden lg:flex flex-col w-[320px] gap-4 shrink-0">
-          <h2 className="type-title-md">Maven Selections</h2>
-          <div className="flex-grow flex flex-col items-center justify-center bg-surface-container-low/50 rounded-xl border border-outline-variant/20 border-dashed p-8 text-center">
-            <span
-              className="material-symbols-outlined text-outline/50 mb-4 select-none"
-              style={{ fontSize: 40, fontVariationSettings: "'FILL' 0" }}
-            >
-              restaurant
-            </span>
-            <p className="type-body-sm text-secondary">
-              Curated picks will appear here as you chat.
-            </p>
-            <p className="type-label-sm text-secondary/50 mt-1">
-              Try &ldquo;Best biryani in the old city&rdquo;
-            </p>
-          </div>
-        </aside>
+            <div className="px-6 py-4 border-t border-surface-container-highest shrink-0">
+              <div className="flex items-center gap-3 bg-surface-container rounded-2xl px-5 py-2.5 border border-outline-variant/40 focus-within:border-primary/50 transition-colors">
+                <textarea
+                  ref={textareaRef}
+                  rows={1}
+                  value={input}
+                  onChange={handleInput}
+                  onKeyDown={handleKey}
+                  placeholder="Ask about biryani, cafes, late-night eats…"
+                  disabled={loading}
+                  className="flex-grow bg-transparent border-none focus:outline-none type-body-md py-1 disabled:opacity-50 placeholder:text-secondary/50 resize-none overflow-y-auto max-h-32 leading-relaxed"
+                />
+                <button
+                  onClick={() => send(input)}
+                  disabled={!input.trim() || loading}
+                  className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary hover:opacity-90 active:scale-95 transition-all shrink-0 disabled:opacity-30 disabled:pointer-events-none"
+                >
+                  <span
+                    className="material-symbols-outlined select-none"
+                    style={{ fontSize: 16, fontVariationSettings: "'FILL' 1" }}
+                  >
+                    send
+                  </span>
+                </button>
+              </div>
+              <p className="type-label-sm text-secondary/40 text-center mt-2.5 text-xs">
+                Recommendations are from the MMDb database only
+              </p>
+            </div>
+          </section>
 
+          <aside className="hidden lg:flex flex-col w-[320px] gap-4 shrink-0">
+            <h2 className="type-title-md">Maven Selections</h2>
+            <div className="flex-grow flex flex-col items-center justify-center bg-surface-container-low/50 rounded-xl border border-outline-variant/20 border-dashed p-8 text-center">
+              <span
+                className="material-symbols-outlined text-outline/50 mb-4 select-none"
+                style={{ fontSize: 40, fontVariationSettings: "'FILL' 0" }}
+              >
+                restaurant
+              </span>
+              <p className="type-body-sm text-secondary">
+                Curated picks will appear here as you chat.
+              </p>
+              <p className="type-label-sm text-secondary/50 mt-1">
+                Try &ldquo;Best biryani in the old city&rdquo;
+              </p>
+            </div>
+          </aside>
+
+        </div>
       </div>
-    </div>
+    </>
   );
 }
