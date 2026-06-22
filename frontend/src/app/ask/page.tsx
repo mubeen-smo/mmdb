@@ -126,10 +126,7 @@ export default function AskPage() {
         }
       `}</style>
 
-      {/* h-[calc(100dvh-3.5rem)] = full viewport minus mobile navbar (h-14)
-          md:h-[calc(100dvh-5rem)] = full viewport minus desktop navbar (h-20)
-          dvh shrinks when soft keyboard appears, keeping input pinned */}
-      <div className="flex flex-col h-[calc(100dvh-3.5rem)] md:h-[calc(100dvh-5rem)] max-h-[calc(100dvh-3.5rem)] md:max-h-[calc(100dvh-5rem)] overflow-hidden">
+      <div className="fixed inset-x-0 top-14 md:top-20 bottom-0 flex flex-col overflow-hidden bg-surface z-10">
 
         {/* Chat header */}
         <header className="shrink-0 flex items-center gap-3 px-4 md:px-6 py-3.5 border-b border-outline-variant/20 bg-surface-container-low/30">
@@ -150,7 +147,7 @@ export default function AskPage() {
         {/* Scrollable message list */}
         <div
           ref={scrollBoxRef}
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-6"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4"
         >
           <div className="max-w-2xl mx-auto flex flex-col gap-3">
 
@@ -226,14 +223,14 @@ export default function AskPage() {
             )}
 
             {messages.length === 1 && !loading && (
-              <div className="flex flex-col items-center gap-6 py-12 px-4">
-                <p className="text-xs text-secondary/60 uppercase tracking-widest">Try asking</p>
-                <div className="flex flex-wrap gap-2 justify-center max-w-md">
+              <div className="flex flex-col items-end gap-2 pt-4 pb-2 px-1">
+                <p className="text-[10px] text-secondary/50 uppercase tracking-widest pr-1">Try asking</p>
+                <div className="flex flex-wrap gap-1.5 justify-end">
                   {SUGGESTED_PROMPTS.map(prompt => (
                     <button
                       key={prompt}
                       onClick={() => send(prompt)}
-                      className="px-4 py-2 bg-surface-container border border-outline-variant rounded-full text-sm text-on-surface-variant hover:border-primary hover:text-primary transition-colors"
+                      className="px-3 py-1 bg-surface-container/60 border border-outline-variant/40 rounded-full text-xs text-on-surface-variant/80 hover:border-primary/60 hover:text-primary transition-colors"
                     >
                       {prompt}
                     </button>

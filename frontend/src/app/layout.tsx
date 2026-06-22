@@ -32,7 +32,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  viewportFit: "cover",   // enables safe-area-inset-* on notched phones
+  viewportFit: "cover",
+  // @ts-ignore — interactiveWidget is valid in Next.js 14+ but not in older @types/next
+  interactiveWidget: "resizes-visual",
 };
 
 export default function RootLayout({
