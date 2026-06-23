@@ -21,51 +21,38 @@ MAX_HISTORY_MESSAGES = 8
 
 _OCCASION_WORDS = {"date", "romantic", "family", "anniversary", "celebration", "celebrate", "birthday", "special"}
 
-SYSTEM = """\
-You are MMDb Maven, an editorial food guide for Hyderabad, India.
-
-════════════════════════════════════════════════════════════
-STRICT GROUNDING RULE — this overrides every other instruction
-════════════════════════════════════════════════════════════
-You may ONLY name places and dishes that appear verbatim in the
-tool results returned to you in this conversation turn.
-
-- If a tool returned 3 places, your response may mention at most
-  those 3 places. Never add a 4th from general knowledge.
-- Never invent dish names, variety names, or item descriptions.
-  Use exact names from tool output — no paraphrasing, no guessing
-  at what else a place might serve.
-- If tool results are sparse or empty, say so directly. Do NOT pad
-  with places or dishes you know from training data.
-- Brand names (Haagen-Dazs, McDonald's, KFC, Domino's, etc.) must
-  NEVER appear in your response unless a tool explicitly returned them.
-- Do not volunteer "you could also try…" suggestions beyond what tools
-  returned. Silence is better than invention.
-════════════════════════════════════════════════════════════
-
-You have tools to search the MMDb database. Use them whenever the user asks
-about food, places, dishes, or areas.
-
-Location handling:
-- When the user mentions a specific area ("near Madhapur", "around Banjara Hills",
-  "in Jubilee Hills"), pass that area name in the area argument of search_places.
-  Results are automatically ranked by proximity to that area and cross-city results
-  are filtered out. Do NOT set any separate location parameter.
-- GPS coordinates are only sent when the user says "near me" / "around me" / similar.
-  The system injects them automatically; you do not need to ask the user for their location.
-- For location-scoped dish queries ("biryani near Madhapur"), call search_places with
-  the area first to get a ranked place list, then call search_items with the top
-  place_id values from that result. This ensures dish results come from nearby places.
-- Never mention coordinates, proximity scoring, or radius filtering to the user.
-
-Style:
-- Direct and opinionated, like a trusted food critic
-- Place and dish names in **bold**
-- Lead with your single best pick, briefly explain why
-- Bullet list for alternatives, 3–4 max
-- If tool results are empty, say so and suggest the user rephrase
-- Never mention prices, price tiers, or cost in your responses
-"""
+SYSTEM = (
+    "You are MMDb Maven, an editorial food guide for Hyderabad, India.\n"
+    "\n"
+    "STRICT GROUNDING RULE\n"
+    "You may ONLY name places and dishes that appear verbatim in the\n"
+    "tool results returned to you in this conversation turn.\n"
+    "- If a tool returned 3 places, your response may mention at most those 3 places.\n"
+    "- Never invent dish names, variety names, or item descriptions.\n"
+    "- If tool results are sparse or empty, say so directly.\n"
+    "- Brand names must NEVER appear unless a tool explicitly returned them.\n"
+    "- Do not volunteer suggestions beyond what tools returned.\n"
+    "\n"
+    "You have tools to search the MMDb database. Use them whenever the user asks\n"
+    "about food, places, dishes, or areas.\n"
+    "\n"
+    "Location handling:\n"
+    "- When the user mentions a specific area, pass that area name in the area\n"
+    "  argument of search_places. Results are automatically ranked by proximity.\n"
+    "- GPS coordinates are only sent when the user says 'near me'. The system\n"
+    "  injects them automatically.\n"
+    "- For location-scoped dish queries ('biryani near Madhapur'), call search_places\n"
+    "  with the area first, then call search_items with the top place_id values.\n"
+    "- Never mention coordinates, proximity scoring, or radius filtering to the user.\n"
+    "\n"
+    "Style:\n"
+    "- Direct and opinionated, like a trusted food critic\n"
+    "- Place and dish names in **bold**\n"
+    "- Lead with your single best pick, briefly explain why\n"
+    "- Bullet list for alternatives, 3-4 max\n"
+    "- If tool results are empty, say so and suggest the user rephrase\n"
+    "- Never mention prices, price tiers, or cost in your responses\n"
+)
 
 _groq_client: AsyncOpenAI | None = None
 
@@ -84,7 +71,6 @@ def _get_groq() -> AsyncOpenAI:
 
 
 def _slim_for_llm(results: list[dict], occasion: bool = False) -> list[dict]:
-    """Trim each result to only the fields the LLM needs. Full dicts are never modified."""
     slimmed = []
     for r in results:
         if "item" in r:
@@ -122,7 +108,6 @@ async def _dispatch_tool(
     user_lat: float | None,
     user_lng: float | None,
 ) -> str:
-    """Execute a tool call and return its result as a JSON string."""
     if name == "search_places":
         result = await search_places(
             db,
@@ -183,19 +168,17 @@ def _extract_bolded(text_str: str) -> list[str]:
 async def _unknown_names(db: AsyncSession, names: list[str]) -> list[str]:
     if not names:
         return []
-    # Single batched query instead of N sequential queries
-    params = {f"n{i}": name for i, name in enumerate(names)}
-    place_clause = " OR ".join(f"place_name ILIKE :n{i}" for i in range(len(names)))
-    item_clause  = " OR ".join(f"item ILIKE :n{i}"       for i in range(len(names)))
-    row = await db.execute(
-        text(f"""
-            SELECT LOWER(place_name) FROM places_table WHERE {place_clause}
-            UNION
-            SELECT LOWER(item)       FROM items_table   WHERE {item_clause}
-        """),
+    unions = " UNION ALL ".join(
+        "SELECT :n{i} AS matched FROM places_table WHERE place_name ILIKE :n{i} "
+        "UNION ALL SELECT :n{i} FROM items_table WHERE item ILIKE :n{i}".format(i=i)
+        for i in range(len(names))
+    )
+    params = {"n{}".format(i): name for i, name in enumerate(names)}
+    result = await db.execute(
+        text("SELECT DISTINCT matched FROM ({}) AS t".format(unions)),
         params,
     )
-    found = {r[0] for r in row.all()}
+    found = {r[0].lower() for r in result.all()}
     return [n for n in names if n.lower() not in found]
 
 
@@ -206,21 +189,11 @@ async def run_pipeline(
     user_lng: float | None = None,
     conversation_id: str | None = None,
 ) -> tuple[str, str | None]:
-    """
-    Run the agentic loop.
-
-    Returns (reply_text, conversation_id).
-    If conversation_id is None a new one is not created here — the caller
-    (routes.py) should generate and pass one.
-    """
-    # Load server-side history
     history: list[dict] = []
     if conversation_id:
         history = await load_conversation(db, conversation_id)
-        # Run cleanup opportunistically (cheap; no scheduler needed)
         await cleanup_old_conversations(db)
 
-    # Build the full message list: system + capped history + new user turn
     user_turn = next((m for m in reversed(messages) if m["role"] == "user"), None)
     if not user_turn:
         return "I didn't receive a question. Please try again.", conversation_id
@@ -233,7 +206,6 @@ async def run_pipeline(
     cid = conversation_id or "none"
     pipeline_t0 = time.perf_counter()
 
-    # Agent loop — max MAX_ROUNDS before forcing a final answer
     for round_idx in range(MAX_ROUNDS):
         is_last_round = round_idx == MAX_ROUNDS - 1
 
@@ -250,7 +222,7 @@ async def run_pipeline(
             logger.info("stage=llm_round round=%d ms=%.1f cid=%s", round_idx, (time.perf_counter() - t0) * 1000, cid)
         except BadRequestError as exc:
             if "tool_use_failed" in str(exc):
-                logger.warning("Groq tool_use_failed — retrying without tools: %s", exc)
+                logger.warning("Groq tool_use_failed -- retrying without tools: %s", exc)
                 t0 = time.perf_counter()
                 response = await client.chat.completions.create(
                     model=MODEL,
@@ -265,21 +237,19 @@ async def run_pipeline(
 
         assistant_msg = response.choices[0].message
 
-        # No tool calls → final answer
         if not assistant_msg.tool_calls:
             reply = assistant_msg.content or "No answer generated. Try rephrasing."
 
-            # Grounding check: verify every bolded name exists in the DB
             try:
                 bolded = _extract_bolded(reply)
                 if bolded:
                     unknown = await _unknown_names(db, bolded)
                     if unknown:
-                        logger.warning("Grounding violation — unknown names: %s", unknown)
+                        logger.warning("Grounding violation -- unknown names: %s", unknown)
                         correction = (
-                            f"CORRECTION: The following names you mentioned are not in the MMDb database: "
-                            f"{', '.join(unknown)}. "
-                            "Rewrite your response using only the tool results already provided above, "
+                            "CORRECTION: The following names you mentioned are not in the MMDb database: "
+                            + ", ".join(unknown)
+                            + ". Rewrite your response using only the tool results already provided above, "
                             "or tell the user that nothing matched their query. Do not invent any names."
                         )
                         llm_messages.append({"role": "assistant", "content": reply})
@@ -297,7 +267,6 @@ async def run_pipeline(
             except Exception as exc:
                 logger.warning("Grounding check failed, skipping: %s", exc)
 
-            # Persist: append user turn + assistant reply to history
             if conversation_id:
                 updated = list(history) + [
                     user_turn,
@@ -307,7 +276,6 @@ async def run_pipeline(
             logger.info("stage=pipeline_total ms=%.1f cid=%s", (time.perf_counter() - pipeline_t0) * 1000, cid)
             return reply, conversation_id
 
-        # Append the assistant's tool-call turn to the message list
         llm_messages.append({
             "role": "assistant",
             "content": assistant_msg.content,
@@ -324,7 +292,25 @@ async def run_pipeline(
             ],
         })
 
-        # Execute all tool calls and append all results before next LLM call
         for tc in assistant_msg.tool_calls:
             try:
-         
+                args = json.loads(tc.function.arguments) or {}
+            except json.JSONDecodeError:
+                args = {}
+            for int_field in ("place_id", "limit"):
+                if int_field in args and isinstance(args[int_field], str):
+                    try:
+                        args[int_field] = int(args[int_field])
+                    except ValueError:
+                        args.pop(int_field)
+            tool_result = await _dispatch_tool(
+                tc.function.name, args, db, user_lat, user_lng
+            )
+            llm_messages.append({
+                "role": "tool",
+                "tool_call_id": tc.id,
+                "content": tool_result,
+            })
+
+    logger.info("stage=pipeline_total ms=%.1f cid=%s", (time.perf_counter() - pipeline_t0) * 1000, cid)
+    return "I couldn't produce an answer. Please try rephrasing.", conversation_id

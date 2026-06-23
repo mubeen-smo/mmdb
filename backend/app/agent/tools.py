@@ -93,7 +93,6 @@ def _place_dict(p: Place) -> dict:
         "service_rating": p.service_rating,
         "open_time": p.open_time,
         "description": (p.description or "")[:200],
-        # included for scoring; stripped before LLM output
         "latitude": p.latitude,
         "longitude": p.longitude,
     }
@@ -121,7 +120,6 @@ AREA_RADIUS_KM = 8
 async def _resolve_area_centroid(
     db: AsyncSession, area: str
 ) -> tuple[float, float] | None:
-    """Return (avg_lat, avg_lng) for places in the named area, or None."""
     result = await db.execute(
         text("""
             SELECT AVG(latitude) AS lat, AVG(longitude) AS lng
@@ -152,7 +150,6 @@ async def search_places(
 ) -> list[dict] | list[int]:
     fetch = min(limit * 2, 20)
 
-    # Priority: named area centroid > user GPS > nothing
     ref_lat: float | None = None
     ref_lng: float | None = None
     _ref_from_area = False
@@ -165,10 +162,8 @@ async def search_places(
     elif user_lat is not None and user_lng is not None:
         ref_lat, ref_lng = user_lat, user_lng
 
-    # 1. Start embedding in background while keyword query runs
     embed_task = asyncio.ensure_future(_embed(query)) if query else None
 
-    # Keyword search
     stmt = select(Place)
     if query:
         stmt = stmt.where(or_(
@@ -187,7 +182,6 @@ async def search_places(
         rows = await db.execute(stmt)
     keyword_places = [_place_dict(p) for p in rows.scalars().all()]
 
-    # 2. Semantic search — embedding was running concurrently
     semantic_places: list[dict] = []
     if query and embed_task is not None:
         try:
@@ -218,7 +212,6 @@ async def search_places(
             if embed_task and not embed_task.done():
                 embed_task.cancel()
 
-    # 3. Score
     _ambience_mode = sort_by == "ambience"
     _rating_mode   = sort_by == "rating"
 
@@ -240,17 +233,13 @@ async def search_places(
                 proximity = _proximity_score(dist) * 0.2
 
             if _ambience_mode:
-                # Ambience is the primary signal; semantic similarity is secondary
                 p["final_score"] = (ambience / 10.0) * 0.6 + sim * 0.2 + proximity
             elif _rating_mode:
-                # Overall rating (avg ambience+service) dominates
                 p["final_score"] = ((ambience + service) / 2) / 10.0 * 0.6 + sim * 0.2 + proximity
             else:
-                # Default: semantic similarity leads, rating boosts
                 p["final_score"] = sim + ((ambience + service) / 2) / 10.0 * 0.3 + proximity
         return places
 
-    # 4. Merge (semantic first — higher-quality scores; keyword fills gaps)
     seen: set[int] = set()
     merged: list[dict] = []
     for p in _score(semantic_places):
@@ -263,7 +252,6 @@ async def search_places(
             merged.append(p)
     merged.sort(key=lambda x: x["final_score"], reverse=True)
 
-    # Hard radius cut for named-area queries; GPS queries stay weight-only
     if _ref_from_area:
         merged = [
             p for p in merged
@@ -275,7 +263,6 @@ async def search_places(
     if return_ids_only:
         return [p["place_id"] for p in merged]
 
-    # 5. Strip internal fields before returning to LLM
     for p in merged:
         p.pop("latitude", None)
         p.pop("longitude", None)
@@ -295,10 +282,8 @@ async def search_items(
     signature: bool | None = None,
     place_id: int | list[int] | None = None,
     limit: int = 8,
-    # server-side injected — not in LLM tool schema
     user_lat: float | None = None,
     user_lng: float | None = None,
-    # picked up by _dispatch_tool for location scoping; ignored inside this function
     reference_area: str | None = None,
 ) -> list[dict]:
     fetch = min(limit * 2, 20)
@@ -307,10 +292,8 @@ async def search_items(
     if diet is not None and diet not in VALID_DIETS:
         diet = None
 
-    # 1. Start embedding in background while keyword query runs
     embed_task = asyncio.ensure_future(_embed(query)) if query else None
 
-    # Keyword search
     stmt = select(Item)
     if query:
         stmt = stmt.where(or_(
@@ -335,11 +318,69 @@ async def search_items(
         rows = await db.execute(stmt)
     keyword_items = [_item_dict(i) for i in rows.scalars().all()]
 
-    # 2. Semantic search — embedding was running concurrently
     semantic_items: list[dict] = []
     if query and embed_task is not None:
         try:
             async with _timed("embed_query"):
                 vec = _vec_str(await embed_task)
             async with _timed("semantic_db"):
-                se
+                sem_rows = await db.execute(
+                    text("""
+                        SELECT
+                            i.item_id, i.place_id, i.item, i.place_name,
+                            i.diet, i.course, i.meal_time, i.price,
+                            i.signature, i.item_rating,
+                            LEFT(i.description, 200) AS description,
+                            1 - (e.embedding <=> :vec ::vector) AS similarity
+                        FROM embeddings e
+                        JOIN items_table i
+                          ON i.item_id = e.source_id AND i.place_id = e.source_id2
+                        WHERE e.source_type = 'item'
+                        ORDER BY e.embedding <=> :vec ::vector
+                        LIMIT :limit
+                    """),
+                    {"vec": vec, "limit": fetch},
+                )
+            semantic_items = [dict(r) for r in sem_rows.mappings().all()]
+        except Exception as exc:
+            logger.warning("Embedding failed, using keyword-only search: %s", exc)
+            if embed_task and not embed_task.done():
+                embed_task.cancel()
+
+    def _score(items: list[dict], base_sim: float = 0.5) -> list[dict]:
+        for i in items:
+            sim = float(i.get("similarity") or base_sim)
+            rating = float(i.get("item_rating") or 5.0)
+            i["final_score"] = sim + (rating / 10.0) * 0.3
+        return items
+
+    seen: set[tuple] = set()
+    merged: list[dict] = []
+    for i in _score(semantic_items):
+        key = (i["item_id"], i["place_id"])
+        if key not in seen:
+            seen.add(key)
+            merged.append(i)
+    for i in _score(keyword_items, base_sim=0.5):
+        key = (i["item_id"], i["place_id"])
+        if key not in seen:
+            seen.add(key)
+            merged.append(i)
+    merged.sort(key=lambda x: x["final_score"], reverse=True)
+    merged = merged[:limit]
+
+    for i in merged:
+        i.pop("similarity", None)
+        i.pop("final_score", None)
+
+    return merged
+
+
+async def list_areas(db: AsyncSession) -> list[str]:
+    rows = await db.execute(
+        select(Place.area)
+        .where(Place.area.is_not(None))
+        .distinct()
+        .order_by(Place.area)
+    )
+    return [r[0] for r in rows.all()]

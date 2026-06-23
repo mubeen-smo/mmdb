@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import uuid
 
@@ -12,8 +11,6 @@ from app.core.database import get_db
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/chat", tags=["chat"])
 
-PIPELINE_TIMEOUT = 25  # seconds — fail fast before Render's 60s wall
-
 
 @router.post("", response_model=ChatResponse)
 async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)):
@@ -21,15 +18,15 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)):
     conversation_id = request.conversation_id or str(uuid.uuid4())
 
     try:
-        reply, conversation_id = await asyncio.wait_for(
-            run_pipeline(
-                messages,
-                db,
-                request.lat,
-                request.lng,
-                conversation_id=conversation_id,
-            ),
-            timeout=PIPELINE_TIMEOUT,
+        reply, conversation_id = await run_pipeline(
+            messages,
+            db,
+            request.lat,
+            request.lng,
+            conversation_id=conversation_id,
         )
-    except asyncio.TimeoutError:
-        logger.erro
+    except Exception as exc:
+        logger.error("Pipeline error: %s", exc, exc_info=True)
+        reply = "I ran into a problem on my end. Please try again in a moment."
+
+    return ChatResponse(reply=reply, conversation_id=conversation_id)

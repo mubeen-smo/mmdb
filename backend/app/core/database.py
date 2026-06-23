@@ -6,8 +6,19 @@ from app.core.config import settings
 engine = create_async_engine(
     settings.database_url,
     pool_pre_ping=True,
-    pool_size=3,          # keep connections warm; free tier doesn't need more
-    max_overflow=2,       # allow brief spikes
-    pool_recycle=300,     # recycle before Supabase's idle timeout (~600s)
-    pool_timeout=10,      # fail fast if no connection available
-    connect_args={
+    pool_size=3,
+    max_overflow=2,
+    pool_recycle=300,
+    pool_timeout=10,
+    connect_args={"ssl": "require", "statement_cache_size": 0},
+)
+AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+async def get_db() -> AsyncSession:
+    async with AsyncSessionLocal() as session:
+        yield session
