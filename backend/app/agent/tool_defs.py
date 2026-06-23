@@ -35,7 +35,9 @@ TOOL_DEFINITIONS: list[dict] = [
                         "type": "string",
                         "description": (
                             "Type of establishment — e.g. 'restaurant', 'cafe', "
-                            "'dhaba', 'bakery', 'street food'."
+                            "'dhaba', 'bakery', 'food-court'. "
+                            "Do NOT use this for 'street food' queries — pass 'street food' "
+                            "as the query argument instead so keyword and semantic search apply."
                         ),
                     },
                     "veg_friendly": {
@@ -107,13 +109,4 @@ TOOL_DEFINITIONS: list[dict] = [
             "description": (
                 "Return a list of all neighbourhoods and localities covered in the MMDb "
                 "database. Use this when the user asks which areas are covered, or to "
-                "help them pick a location to filter by."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {},
-                "required": [],
-            },
-        },
-    },
-]
+                "help them pick a location
