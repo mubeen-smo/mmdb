@@ -15,8 +15,11 @@ from app.item.models import Item
 from app.place.models import Place
 
 EMBED_MODEL = "text-embedding-3-small"
+_EMBED_CACHE_MAX = 256
 
 _openai_client: AsyncOpenAI | None = None
+# FIFO embedding cache: query_lower -> vector (~300ms saved per cache hit)
+_embed_cache: dict[str, list[float]] = {}
 
 
 @asynccontextmanager
@@ -41,8 +44,16 @@ def _get_openai() -> AsyncOpenAI:
 
 
 async def _embed(query: str) -> list[float]:
+    key = query.strip().lower()
+    if key in _embed_cache:
+        logger.info("stage=embed_cache hit")
+        return _embed_cache[key]
     resp = await _get_openai().embeddings.create(model=EMBED_MODEL, input=query)
-    return resp.data[0].embedding
+    vec = resp.data[0].embedding
+    if len(_embed_cache) >= _EMBED_CACHE_MAX:
+        _embed_cache.pop(next(iter(_embed_cache)))
+    _embed_cache[key] = vec
+    return vec
 
 
 def _vec_str(vec: list[float]) -> str:
@@ -329,56 +340,4 @@ async def search_items(
                             1 - (e.embedding <=> :vec ::vector) AS similarity
                         FROM embeddings e
                         JOIN items_table i
-                          ON i.item_id = e.source_id AND i.place_id = e.source_id2
-                        WHERE e.source_type = 'item'
-                        ORDER BY e.embedding <=> :vec ::vector
-                        LIMIT :limit
-                    """),
-                    {"vec": vec, "limit": fetch},
-                )
-            semantic_items = [dict(r) for r in sem_rows.mappings().all()]
-        except Exception as exc:
-            logger.warning("Embedding failed, using keyword-only search: %s", exc)
-            if embed_task and not embed_task.done():
-                embed_task.cancel()
-
-    # 3. Score
-    def _score(items: list[dict], base_sim: float = 0.5) -> list[dict]:
-        for i in items:
-            sim = float(i.get("similarity") or base_sim)
-            rating = float(i.get("item_rating") or 5.0)
-            i["final_score"] = sim + (rating / 10.0) * 0.3
-        return items
-
-    # 4. Merge
-    seen: set[tuple] = set()
-    merged: list[dict] = []
-    for i in _score(semantic_items):
-        key = (i["item_id"], i["place_id"])
-        if key not in seen:
-            seen.add(key)
-            merged.append(i)
-    for i in _score(keyword_items, base_sim=0.5):
-        key = (i["item_id"], i["place_id"])
-        if key not in seen:
-            seen.add(key)
-            merged.append(i)
-    merged.sort(key=lambda x: x["final_score"], reverse=True)
-    merged = merged[:limit]
-
-    # 5. Strip internal fields
-    for i in merged:
-        i.pop("similarity", None)
-        i.pop("final_score", None)
-
-    return merged
-
-
-async def list_areas(db: AsyncSession) -> list[str]:
-    rows = await db.execute(
-        select(Place.area)
-        .where(Place.area.is_not(None))
-        .distinct()
-        .order_by(Place.area)
-    )
-    return [r[0] for r in rows.all()]
+                          ON i.item_id = e.sour

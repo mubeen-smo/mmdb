@@ -181,20 +181,22 @@ def _extract_bolded(text_str: str) -> list[str]:
 
 
 async def _unknown_names(db: AsyncSession, names: list[str]) -> list[str]:
-    unknown = []
-    for name in names:
-        row = await db.execute(
-            text("""
-                SELECT 1 FROM places_table WHERE place_name ILIKE :n
-                UNION ALL
-                SELECT 1 FROM items_table WHERE item ILIKE :n
-                LIMIT 1
-            """),
-            {"n": name},
-        )
-        if row.first() is None:
-            unknown.append(name)
-    return unknown
+    if not names:
+        return []
+    # Single batched query instead of N sequential queries
+    params = {f"n{i}": name for i, name in enumerate(names)}
+    place_clause = " OR ".join(f"place_name ILIKE :n{i}" for i in range(len(names)))
+    item_clause  = " OR ".join(f"item ILIKE :n{i}"       for i in range(len(names)))
+    row = await db.execute(
+        text(f"""
+            SELECT LOWER(place_name) FROM places_table WHERE {place_clause}
+            UNION
+            SELECT LOWER(item)       FROM items_table   WHERE {item_clause}
+        """),
+        params,
+    )
+    found = {r[0] for r in row.all()}
+    return [n for n in names if n.lower() not in found]
 
 
 async def run_pipeline(
@@ -325,25 +327,4 @@ async def run_pipeline(
         # Execute all tool calls and append all results before next LLM call
         for tc in assistant_msg.tool_calls:
             try:
-                args = json.loads(tc.function.arguments) or {}
-            except json.JSONDecodeError:
-                args = {}
-            # Groq/Llama sometimes serialises integers as strings; coerce known int fields.
-            for int_field in ("place_id", "limit"):
-                if int_field in args and isinstance(args[int_field], str):
-                    try:
-                        args[int_field] = int(args[int_field])
-                    except ValueError:
-                        args.pop(int_field)
-            tool_result = await _dispatch_tool(
-                tc.function.name, args, db, user_lat, user_lng
-            )
-            llm_messages.append({
-                "role": "tool",
-                "tool_call_id": tc.id,
-                "content": tool_result,
-            })
-
-    # Should not normally reach here (last round forces tool_choice="none")
-    logger.info("stage=pipeline_total ms=%.1f cid=%s", (time.perf_counter() - pipeline_t0) * 1000, cid)
-    return "I couldn't produce an answer. Please try rephrasing.", conversation_id
+         
