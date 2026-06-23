@@ -195,6 +195,7 @@
 
 html {
   overflow-x: clip;                  /* kill horizontal scroll without breaking sticky */
+  overscroll-behavior-y: auto;       /* re-enable pull-to-refresh on iOS Safari */
   -webkit-text-size-adjust: 100%;    /* prevent iOS auto font-size inflation */
   text-size-adjust: 100%;
 }
@@ -512,8 +513,4 @@ a, button {
   padding-inline: var(--spacing-margin-mobile);
 }
 
-@media (min-width: 768px) {
-  .page-container {
-    padding-inline: var(--spacing-margin-desktop);
-  }
-}
+@media (min-width: 768
