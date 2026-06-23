@@ -143,6 +143,7 @@ async def search_places(
     query: str | None = None,
     area: str | None = None,
     place_type: str | None = None,
+    sort_by: str | None = None,
     veg_friendly: bool | None = None,
     limit: int = 5,
     user_lat: float | None = None,
@@ -218,12 +219,14 @@ async def search_places(
                 embed_task.cancel()
 
     # 3. Score
+    _ambience_mode = sort_by == "ambience"
+    _rating_mode   = sort_by == "rating"
+
     def _score(places: list[dict], base_sim: float = 0.5) -> list[dict]:
         for p in places:
             sim = float(p.get("similarity") or base_sim)
             ambience = float(p.get("ambience_rating") or 5.0)
-            service = float(p.get("service_rating") or 5.0)
-            rating_score = ((ambience + service) / 2) / 10.0 * 0.3
+            service  = float(p.get("service_rating")  or 5.0)
             proximity = 0.0
             p["_dist_km"] = None
             if (
@@ -235,7 +238,16 @@ async def search_places(
                 dist = _haversine_km(ref_lat, ref_lng, float(p["latitude"]), float(p["longitude"]))
                 p["_dist_km"] = dist
                 proximity = _proximity_score(dist) * 0.2
-            p["final_score"] = sim + rating_score + proximity
+
+            if _ambience_mode:
+                # Ambience is the primary signal; semantic similarity is secondary
+                p["final_score"] = (ambience / 10.0) * 0.6 + sim * 0.2 + proximity
+            elif _rating_mode:
+                # Overall rating (avg ambience+service) dominates
+                p["final_score"] = ((ambience + service) / 2) / 10.0 * 0.6 + sim * 0.2 + proximity
+            else:
+                # Default: semantic similarity leads, rating boosts
+                p["final_score"] = sim + ((ambience + service) / 2) / 10.0 * 0.3 + proximity
         return places
 
     # 4. Merge (semantic first — higher-quality scores; keyword fills gaps)
@@ -330,14 +342,4 @@ async def search_items(
             async with _timed("embed_query"):
                 vec = _vec_str(await embed_task)
             async with _timed("semantic_db"):
-                sem_rows = await db.execute(
-                    text("""
-                        SELECT
-                            i.item_id, i.place_id, i.item, i.place_name,
-                            i.diet, i.course, i.meal_time, i.price,
-                            i.signature, i.item_rating,
-                            LEFT(i.description, 200) AS description,
-                            1 - (e.embedding <=> :vec ::vector) AS similarity
-                        FROM embeddings e
-                        JOIN items_table i
-                          ON i.item_id = e.sour
+                se

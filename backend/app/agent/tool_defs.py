@@ -36,8 +36,18 @@ TOOL_DEFINITIONS: list[dict] = [
                         "description": (
                             "Type of establishment — e.g. 'restaurant', 'cafe', "
                             "'dhaba', 'bakery', 'food-court'. "
-                            "Do NOT use this for 'street food' queries — pass 'street food' "
-                            "as the query argument instead so keyword and semantic search apply."
+                            "Do NOT set this for 'street food' queries — pass 'street food' "
+                            "as the query argument instead so semantic and tag search applies."
+                        ),
+                    },
+                    "sort_by": {
+                        "type": "string",
+                        "enum": ["ambience", "rating"],
+                        "description": (
+                            "Sort results by a specific quality signal. "
+                            "Use 'ambience' when the user asks about atmosphere, vibe, "
+                            "decor, good ambience, rooftop, or pleasant setting. "
+                            "Use 'rating' for general 'best' or 'top-rated' queries with no location bias."
                         ),
                     },
                     "veg_friendly": {
@@ -93,20 +103,4 @@ TOOL_DEFINITIONS: list[dict] = [
                         "type": "string",
                         "description": (
                             "Named area from the user's query when they ask for a dish near a location "
-                            "('ice cream near Madhapur' → 'Madhapur'). Do NOT set this for 'near me' queries — "
-                            "those use GPS coordinates injected server-side."
-                        ),
-                    },
-                },
-                "required": [],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "list_areas",
-            "description": (
-                "Return a list of all neighbourhoods and localities covered in the MMDb "
-                "database. Use this when the user asks which areas are covered, or to "
-                "help them pick a location
+                            "('ice cream near Madhapur' → 'Madhapur'). Do NOT set this for '
