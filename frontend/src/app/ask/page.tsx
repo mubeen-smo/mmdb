@@ -25,6 +25,40 @@ export default function AskPage() {
   const scrollBoxRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Pull-to-refresh: detect downward swipe at scroll top
+  const ptrStartY = useRef<number | null>(null);
+  const ptrTriggered = useRef(false);
+
+  useEffect(() => {
+    const el = scrollBoxRef.current;
+    if (!el) return;
+
+    function onTouchStart(e: TouchEvent) {
+      if (el!.scrollTop === 0) {
+        ptrStartY.current = e.touches[0].clientY;
+        ptrTriggered.current = false;
+      } else {
+        ptrStartY.current = null;
+      }
+    }
+
+    function onTouchMove(e: TouchEvent) {
+      if (ptrStartY.current === null || ptrTriggered.current) return;
+      const dy = e.touches[0].clientY - ptrStartY.current;
+      if (dy > 60 && el!.scrollTop === 0) {
+        ptrTriggered.current = true;
+        window.location.reload();
+      }
+    }
+
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+    };
+  }, []);
+
   useEffect(() => {
     const el = scrollBoxRef.current;
     if (el) el.scrollTop = el.scrollHeight;
@@ -34,7 +68,10 @@ export default function AskPage() {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = "auto";
-    el.style.height = `${Math.min(el.scrollHeight, 128)}px`;
+    const next = Math.min(el.scrollHeight, 128);
+    el.style.height = `${next}px`;
+    // Only show scrollbar when content is actually clipped
+    el.style.overflowY = el.scrollHeight > 128 ? "auto" : "hidden";
   }, [input]);
 
   const NEAR_ME_RE = /\b(near|around|close|closest|nearest)\s+me\b|\bmy\s+(area|location|vicinity)\b/i;
@@ -74,7 +111,10 @@ export default function AskPage() {
     const history = [...messages, userMsg];
     setMessages(history);
     setInput("");
-    if (textareaRef.current) textareaRef.current.style.height = "auto";
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.overflowY = "hidden";
+    }
     setLoading(true);
 
     try {
@@ -111,6 +151,12 @@ export default function AskPage() {
     }
   }
 
+  function handleNewChat() {
+    setMessages([{ role: "assistant", content: GREETING_TEXT }]);
+    setConversationId(null);
+    setInput("");
+  }
+
   return (
     <>
       <style>{`
@@ -138,16 +184,29 @@ export default function AskPage() {
               auto_awesome
             </span>
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="type-title-md leading-tight">Maven</h1>
             <p className="type-label-sm text-secondary">Find what to eat, where to go</p>
           </div>
+          <button
+            onClick={handleNewChat}
+            title="New conversation"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-secondary hover:text-on-surface hover:bg-surface-container transition-colors"
+          >
+            <span
+              className="material-symbols-outlined select-none"
+              style={{ fontSize: 20 }}
+            >
+              edit_square
+            </span>
+          </button>
         </header>
 
         {/* Scrollable message list */}
         <div
           ref={scrollBoxRef}
-          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4"
+          className="flex-1 min-h-0 overflow-y-auto px-4 py-4"
+          style={{ overscrollBehaviorY: "contain" }}
         >
           <div className="max-w-2xl mx-auto flex flex-col gap-3">
 
@@ -263,7 +322,7 @@ export default function AskPage() {
                 }}
                 placeholder="Ask about biryani, cafes, late-night eats…"
                 disabled={loading}
-                className="flex-1 bg-transparent resize-none overflow-y-auto text-sm leading-relaxed max-h-32 py-1 focus:outline-none disabled:opacity-50 placeholder:text-secondary/50"
+                className="flex-1 bg-transparent resize-none overflow-y-hidden text-sm leading-relaxed max-h-32 py-1 focus:outline-none disabled:opacity-50 placeholder:text-secondary/50"
               />
               <button
                 onClick={() => send(input)}
